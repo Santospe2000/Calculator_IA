@@ -1,0 +1,8 @@
+pandas
+numpy
+openai
+streamlit
+scikit-learn
+python-dotenv
+matplotlib>=3.0.0
+fpdf2>=2.7.0
