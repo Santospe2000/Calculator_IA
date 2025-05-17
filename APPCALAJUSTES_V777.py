@@ -8,7 +8,7 @@ import re
 import os
 import pandas as pd
 
-# Configuración inicial de la página DEBE SER LO PRIMERO
+# Configuración inicial de la página
 st.set_page_config(
     page_title="Taller de Bienes Raíces",
     page_icon="🏠",
@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Configuración del cliente de OpenAI (versión segura)
+# Configuración del cliente de OpenAI
 client = None
 if 'OPENAI_API_KEY' in st.secrets:
     try:
@@ -29,7 +29,7 @@ else:
     st.warning("Funcionalidad de IA limitada - No se configuró OPENAI_API_KEY")
     st.session_state['openai_configured'] = False
 
-# Estilos CSS personalizados para el formato de calculadora financiera
+# Estilos CSS personalizados
 def load_css():
     st.markdown("""
     <style>
@@ -41,13 +41,6 @@ def load_css():
             --rojo: #EF4444;
         }
         
-        .stApp {
-            max-width: 900px;
-            margin: auto;
-            font-family: 'Arial', sans-serif;
-            background-color: #F9FAFB;
-        }
-        
         .header-container {
             display: flex;
             align-items: center;
@@ -55,7 +48,7 @@ def load_css():
         }
         
         .logo {
-            height: 60px;
+            height: 80px;
             margin-right: 20px;
         }
         
@@ -65,95 +58,6 @@ def load_css():
             padding: 20px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
-        }
-        
-        .stButton>button {
-            background-color: var(--azul-oscuro);
-            color: white;
-            border-radius: 8px;
-            padding: 10px 24px;
-            font-weight: bold;
-            width: 100%;
-        }
-        
-        .stButton>button:hover {
-            background-color: #1E40AF;
-            color: white;
-        }
-        
-        .stTextInput>div>div>input, 
-        .stNumberInput>div>div>input,
-        .stSelectbox>div>div>select,
-        .stMultiselect>div>div>div {
-            border-radius: 8px;
-            border: 1px solid var(--gris);
-        }
-        
-        .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-            color: var(--azul-oscuro);
-        }
-        
-        .stMetric {
-            border-left: 4px solid var(--azul-oscuro);
-            padding-left: 12px;
-            background-color: white;
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .positive-value {
-            color: var(--verde);
-            font-weight: bold;
-        }
-        
-        .negative-value {
-            color: var(--rojo);
-            font-weight: bold;
-        }
-        
-        .data-table {
-            width: 100%;
-            margin-bottom: 20px;
-            border-collapse: collapse;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .data-table th {
-            background-color: var(--azul-oscuro);
-            color: white;
-            padding: 10px;
-            text-align: left;
-        }
-        
-        .data-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        
-        .data-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        
-        .data-table input {
-            width: 100%;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .data-table .total-row {
-            background-color: #EFF6FF;
-            font-weight: bold;
-        }
-        
-        .tips-container {
-            background-color: #f8f9fa;
-            border-left: 4px solid var(--azul-oscuro);
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 0 8px 8px 0;
         }
         
         .tooltip {
@@ -184,16 +88,25 @@ def load_css():
             opacity: 1;
         }
         
-        @media (max-width: 768px) {
-            .header-container {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .logo {
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
+        /* Estilos adicionales para la tabla */
+        .dataframe {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .dataframe th {
+            background-color: var(--azul-oscuro);
+            color: white;
+            text-align: left;
+        }
+        
+        .dataframe td {
+            padding: 8px;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #EFF6FF;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -206,7 +119,6 @@ def format_currency(value):
 def parse_currency(currency_str):
     if not currency_str:
         return 0.0
-    # Eliminar símbolos de moneda y comas
     num_str = re.sub(r'[^\d.]', '', currency_str)
     return float(num_str) if num_str else 0.0
 
@@ -216,11 +128,11 @@ def generate_pdf(usuario_data, finanzas_data, analisis_data):
     pdf.add_page()
     pdf.set_font("Arial", size=12)
     
-    # Encabezado
+    # Encabezado con logo
     pdf.set_font("Arial", 'B', 16)
-    pdf.cell(200, 10, txt="Informe Financiero - Taller de Bienes Raíces", ln=1, align='C')
+    pdf.cell(200, 10, txt="Taller de Bienes Raíces", ln=1, align='C')
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(200, 10, txt="Análisis para Inversiones Inmobiliarias", ln=1, align='C')
+    pdf.cell(200, 10, txt="Informe Financiero Personalizado", ln=1, align='C')
     pdf.ln(10)
     
     # Datos personales
@@ -265,7 +177,7 @@ def generate_pdf(usuario_data, finanzas_data, analisis_data):
     
     return pdf_bytes
 
-# Crear la base de datos y la tabla de usuarios
+# Crear la base de datos
 def crear_base_datos():
     conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
@@ -309,46 +221,34 @@ def registrar_usuario(nombre, edad, email, telefono):
     conn.close()
     return usuario_id
 
-# Función para crear la tabla de activos/pasivos con tooltips
+# Función para crear la tabla de activos/pasivos CORREGIDA (4 columnas)
 def create_asset_table():
-    # Definir tooltips para cada campo
-    tooltips = {
-        "Inmueble 1": "Valor de mercado de tu primera propiedad inmobiliaria",
-        "Inmueble 2": "Valor de mercado de tu segunda propiedad inmobiliaria",
-        "Automóvil 1": "Valor actual de tu vehículo principal",
-        "Automóvil 2": "Valor actual de tu vehículo secundario",
-        "Muebles": "Valor estimado de tus muebles y enseres",
-        "Joyas": "Valor aproximado de tus joyas y artículos de valor",
-        "Arte": "Valor de tus obras de arte o colecciones",
-        "Efectivo cuenta 1": "Saldo disponible en tu cuenta bancaria principal",
-        "Efectivo cuenta 2": "Saldo disponible en tu cuenta bancaria secundaria",
-        "Deudas por cobrar": "Dinero que otras personas/empresas te deben",
-        "Bonos o títulos valores": "Valor de tus inversiones en bonos o títulos",
-        "Fondo de retiro": "Saldo acumulado en tus fondos de pensiones",
-        "Bonos o derechos laborales": "Derechos laborales acumulados"
-    }
+    # Definición completa de la tabla con 4 columnas
+    items = [
+        {"Descripción": "Inmueble 1", "Valor ($)": 25000.0, "Deuda ($)": 1000.0, "Activos ($)": 24000.0},
+        {"Descripción": "Inmueble 2", "Valor ($)": 0.0, "Deuda ($)": 0.0, "Activos ($)": 0.0},
+        {"Descripción": "Automóvil 1", "Valor ($)": 0.0, "Deuda ($)": 0.0, "Activos ($)": 0.0},
+        {"Descripción": "Automóvil 2", "Valor ($)": 0.0, "Deuda ($)": 0.0, "Activos ($)": 0.0},
+        {"Descripción": "Muebles", "Valor ($)": 0.0, "Deuda ($)": 0.0, "Activos ($)": 0.0},
+        {"Descripción": "Joyas", "Valor ($)": 0.0, "Deuda ($)": 0.0, "Activos ($)": 0.0},
+        {"Descripción": "Arte", "Valor ($)": 11000.0, "Deuda ($)": 5000.0, "Activos ($)": 6000.0},
+        {"Descripción": "Efectivo cuenta 1", "Valor ($)": 0.0, "Deuda ($)": 0.0, "Activos ($)": 0.0},
+        {"Descripción": "Efectivo cuenta 2", "Valor ($)": 0.0, "Deuda ($)": 0.0, "Activos ($)": 0.0},
+        {"Descripción": "Deudas por cobrar", "Valor ($)": 25000.0, "Deuda ($)": 2000.0, "Activos ($)": 23000.0},
+        {"Descripción": "Bonos o títulos valores", "Valor ($)": 0.0, "Deuda ($)": 0.0, "Activos ($)": 0.0},
+        {"Descripción": "Fondo de retiro", "Valor ($)": 0.0, "Deuda ($)": 0.0, "Activos ($)": 0.0},
+        {"Descripción": "Bonos o derechos laborales", "Valor ($)": 0.0, "Deuda ($)": 0.0, "Activos ($)": 0.0},
+        {"Descripción": "Total", "Valor ($)": 61000.0, "Deuda ($)": 8000.0, "Activos ($)": 53000.0}
+    ]
 
-    # Crear DataFrame inicial
-    data = {
-        "Descripción": list(tooltips.keys()),
-        "Valor ($)": [0.0] * len(tooltips),
-        "Deuda ($)": [0.0] * len(tooltips),
-        "Activos ($)": [0.0] * len(tooltips)
-    }
+    # Crear DataFrame
+    df = pd.DataFrame(items)
     
-    # Agregar fila de totales
-    data["Descripción"].append("Total")
-    data["Valor ($)"].append(0.0)
-    data["Deuda ($)"].append(0.0)
-    data["Activos ($)"].append(0.0)
-    
-    df = pd.DataFrame(data)
-
     # Configuración de columnas para el editor
     column_config = {
         "Descripción": st.column_config.Column(
             "Descripción",
-            help="Descripción del activo",
+            help="Activo o pasivo financiero",
             width="medium"
         ),
         "Valor ($)": st.column_config.NumberColumn(
@@ -365,17 +265,12 @@ def create_asset_table():
         ),
         "Activos ($)": st.column_config.NumberColumn(
             "Activos ($)",
-            help="Valor neto del activo (Valor - Deuda)",
+            help="Valor neto (Valor - Deuda)",
             format="$%.2f",
             width="small",
             disabled=True
         )
     }
-
-    # Mostrar tooltips como marcas de agua en los inputs
-    for i, desc in enumerate(df["Descripción"][:-1]):
-        if desc in tooltips:
-            column_config["Descripción"].help = tooltips[desc]
 
     # Crear editor de tabla
     edited_df = st.data_editor(
@@ -409,18 +304,18 @@ def create_cashflow_section():
         Para inversiones en bienes raíces, se recomienda un flujo positivo mínimo del 20% de tus ingresos.
         """)
     
-    # Ingresos con tooltips
+    # Ingresos
     st.markdown("#### Ingresos")
     col1, col2 = st.columns(2)
     
-    ingresos = {
+    ingresos_data = {
         "Sueldo principal": {"value": 0.0, "tooltip": "Ingresos fijos por trabajo principal", "col": col1},
-        "Ingresos adicionales": {"value": 0.0, "tooltip": "Otros ingresos (freelance, alquileres, etc.)", "col": col1},
-        "Ingresos pasivos": {"value": 0.0, "tooltip": "Ingresos que no requieren tu tiempo activo", "col": col2},
-        "Otros ingresos": {"value": 0.0, "tooltip": "Cualquier otro ingreso no categorizado", "col": col2}
+        "Ingresos adicionales": {"value": 0.0, "tooltip": "Otros ingresos (freelance, alquileres)", "col": col1},
+        "Ingresos pasivos": {"value": 0.0, "tooltip": "Ingresos que no requieren tu tiempo", "col": col2},
+        "Otros ingresos": {"value": 0.0, "tooltip": "Cualquier otro ingreso", "col": col2}
     }
     
-    for key, item in ingresos.items():
+    for key, item in ingresos_data.items():
         item["value"] = item["col"].number_input(
             f"{key} ❓",
             value=item["value"],
@@ -429,24 +324,24 @@ def create_cashflow_section():
             key=f"ingreso_{key}"
         )
     
-    total_ingresos = sum(item["value"] for item in ingresos.values())
+    total_ingresos = sum(item["value"] for item in ingresos_data.values())
     
-    # Gastos con tooltips
+    # Gastos
     st.markdown("#### Gastos")
     cols = st.columns(2)
     
-    gastos = {
-        "Vivienda": {"value": 0.0, "tooltip": "Hipoteca/alquiler, servicios, mantenimiento", "col": cols[0]},
+    gastos_data = {
+        "Vivienda": {"value": 0.0, "tooltip": "Hipoteca/alquiler, servicios", "col": cols[0]},
         "Alimentación": {"value": 0.0, "tooltip": "Supermercado, restaurantes", "col": cols[0]},
-        "Transporte": {"value": 0.0, "tooltip": "Auto, combustible, transporte público", "col": cols[0]},
-        "Entretenimiento": {"value": 0.0, "tooltip": "Salidas, suscripciones, hobbies", "col": cols[0]},
+        "Transporte": {"value": 0.0, "tooltip": "Auto, combustible, transporte", "col": cols[0]},
+        "Entretenimiento": {"value": 0.0, "tooltip": "Salidas, suscripciones", "col": cols[0]},
         "Deudas": {"value": 0.0, "tooltip": "Pagos de tarjetas, préstamos", "col": cols[1]},
-        "Educación": {"value": 0.0, "tooltip": "Cursos, libros, capacitaciones", "col": cols[1]},
-        "Seguros": {"value": 0.0, "tooltip": "Seguros médicos, de vida, de propiedad", "col": cols[1]},
-        "Otros gastos": {"value": 0.0, "tooltip": "Cualquier otro gasto no categorizado", "col": cols[1]}
+        "Educación": {"value": 0.0, "tooltip": "Cursos, libros, capacitación", "col": cols[1]},
+        "Seguros": {"value": 0.0, "tooltip": "Seguros médicos, de vida", "col": cols[1]},
+        "Otros gastos": {"value": 0.0, "tooltip": "Gastos no categorizados", "col": cols[1]}
     }
     
-    for key, item in gastos.items():
+    for key, item in gastos_data.items():
         item["value"] = item["col"].number_input(
             f"{key} ❓",
             value=item["value"],
@@ -455,7 +350,7 @@ def create_cashflow_section():
             key=f"gasto_{key}"
         )
     
-    total_gastos = sum(item["value"] for item in gastos.values())
+    total_gastos = sum(item["value"] for item in gastos_data.values())
     flujo_caja = total_ingresos - total_gastos
     
     # Análisis de capacidad de inversión
@@ -538,8 +433,8 @@ def generar_plan_trabajo_bienes_raices(ingresos, gastos, activos, pasivos, capac
         cursos_recomendados = """
         ### 📚 Cursos Recomendados de Carlos Devis:
         - [Ciclo Educativo de Bienes Raíces](https://landing.tallerdebienesraices.com/registro-ciclo-educativo/) - Ideal para comenzar
-        - [Estrategias de Inversión con Poco Dinero](https://www.youtube.com/playlist?list=PL2qGhDf0PEjSF5zxLMa6SlVUxPd4273tl) - Para maximizar recursos limitados
-        - [Análisis de Propiedades Rentables](https://www.youtube.com/playlist?list=PL2qGhDf0PEjT9Jy7ULNGfFQvTsruUAyCe) - Para identificar buenas oportunidades
+        - [Estrategias de Inversión con Poco Dinero](https://www.youtube.com/playlist?list=PL2qGhDf0PEjSF5zxLMa6SlVUxPd4273tl) - Para maximizar recursos
+        - [Análisis de Propiedades Rentables](https://www.youtube.com/playlist?list=PL2qGhDf0PEjT9Jy7ULNGfFQvTsruUAyCe) - Para identificar oportunidades
         """
         
         return f"{contenido}\n\n{cursos_recomendados}", perfil
@@ -573,9 +468,9 @@ def analizar_retiro_bienes_raices(edad_actual, edad_retiro, ingresos_retiro, gas
     
     4. **Educación Continua**:
        - Según tu perfil ({perfil_inversion}), considera estos enfoques:
-         { "Alta: Enfoque en adquisición agresiva con apalancamiento" if perfil_inversion == "Alta" else 
+         {"Alta: Enfoque en adquisición agresiva con apalancamiento" if perfil_inversion == "Alta" else 
           "Media: Combinación de crecimiento y seguridad" if perfil_inversion == "Media" else 
-          "Baja: Enfoque en educación primero, luego inversión" }
+          "Baja: Enfoque en educación primero, luego inversión"}
     """
     
     cursos_recomendados = f"""
@@ -610,10 +505,10 @@ def analizar_retiro_bienes_raices(edad_actual, edad_retiro, ingresos_retiro, gas
 def main():
     load_css()  # Cargar estilos CSS personalizados
     
-    # Encabezado con logo
+    # Encabezado con logo - AJUSTADO
     st.markdown("""
     <div class="header-container">
-        <img src="https://via.placeholder.com/60" class="logo" alt="Logo Financiero">
+        <img src="https://raw.githubusercontent.com/carlosdevis/taller-bienes-raices/main/logo.png" class="logo" alt="Logo Taller Bienes Raíces">
         <div>
             <h1 style="margin:0;color:#1E3A8A;">Taller de Bienes Raíces</h1>
             <h3 style="margin:0;color:#6B7280;">Herramienta de Análisis Financiero para Inversiones</h3>
@@ -658,7 +553,7 @@ def main():
             else:
                 st.warning("Por favor completa todos los campos obligatorios")
     
-    # Paso 2: Datos financieros - Activos y Pasivos
+    # Paso 2: Datos financieros - Tabla CORREGIDA de 4 columnas
     if 'usuario_id' in st.session_state:
         with st.container():
             st.subheader("📊 Elaborar mi presupuesto")
@@ -668,7 +563,7 @@ def main():
             para mejorar tu flujo de caja y poder invertir en bienes raíces.
             """)
             
-            st.markdown("### 🏠 Tabla de Activos y Pasivos")
+            st.markdown("### 🏠 Tabla de Activos y Pasivos (4 columnas)")
             asset_table = create_asset_table()
             activos_total = asset_table.at[len(asset_table)-1, "Activos ($)"]
             pasivos_total = asset_table.at[len(asset_table)-1, "Deuda ($)"]
