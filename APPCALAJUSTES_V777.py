@@ -8,7 +8,7 @@ import re
 import os
 import pandas as pd
 
-# Configuración inicial de la página DEBE SER LO PRIMERO
+# Configuración inicial de la página
 st.set_page_config(
     page_title="Taller de Bienes Raíces - Carlos Devis",
     page_icon="💰",
@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Configuración del cliente de OpenAI (versión segura)
+# Configuración del cliente de OpenAI
 client = None
 if 'OPENAI_API_KEY' in st.secrets:
     try:
@@ -29,7 +29,7 @@ else:
     st.warning("Funcionalidad de IA limitada - No se configuró OPENAI_API_KEY")
     st.session_state['openai_configured'] = False
 
-# Estilos CSS personalizados para el formato de calculadora financiera
+# Estilos CSS personalizados
 def load_css():
     st.markdown("""
     <style>
@@ -572,12 +572,12 @@ def main():
     # Paso 1: Registro de usuario
     with st.container():
         st.subheader("📝 Información Personal")
-        nombre = st.text_input("Nombre completo")
-        edad = st.number_input("Edad", min_value=18, max_value=100, value=30)
-        email = st.text_input("Email")
-        telefono = st.text_input("Teléfono")
+        nombre = st.text_input("Nombre completo", key="nombre_input")
+        edad = st.number_input("Edad", min_value=18, max_value=100, value=30, key="edad_input")
+        email = st.text_input("Email", key="email_input")
+        telefono = st.text_input("Teléfono", key="telefono_input")
         
-        if st.button("Guardar información personal"):
+        if st.button("Guardar información personal", key="guardar_info_btn"):
             if nombre and email:
                 usuario_id = registrar_usuario(nombre, edad, email, telefono)
                 st.session_state['usuario_id'] = usuario_id
@@ -646,7 +646,7 @@ def main():
             df = pd.DataFrame(columns=['Descripción', 'Valor', 'Deuda', 'Activos'])
             
             # Llenar la tabla con inputs
-            for item in items:
+            for idx, item in enumerate(items):
                 col1, col2, col3 = st.columns([2, 1, 1])
                 
                 with col1:
@@ -661,7 +661,7 @@ def main():
                     valor = st.text_input(
                         f"Valor {item} ($)", 
                         value=format_currency(st.session_state['finanzas_values'][item]['valor']),
-                        key=f"valor_{item}",
+                        key=f"valor_{idx}_{item}",
                         label_visibility="collapsed"
                     )
                     st.session_state['finanzas_values'][item]['valor'] = parse_currency(valor)
@@ -673,12 +673,18 @@ def main():
                         deuda = st.text_input(
                             f"Deuda {item} ($)", 
                             value=format_currency(st.session_state['finanzas_values'][item]['deuda']),
-                            key=f"deuda_{item}",
+                            key=f"deuda_{idx}_{item}",
                             label_visibility="collapsed"
                         )
                         st.session_state['finanzas_values'][item]['deuda'] = parse_currency(deuda)
                     else:
-                        st.text_input("", value="", disabled=True, label_visibility="collapsed")
+                        st.text_input(
+                            "", 
+                            value="", 
+                            disabled=True, 
+                            key=f"disabled_{idx}_{item}",
+                            label_visibility="collapsed"
+                        )
                 
                 # Calcular activos automáticamente (Valor - Deuda)
                 valor_num = st.session_state['finanzas_values'][item]['valor']
@@ -757,7 +763,7 @@ def main():
             st.markdown("<h4>Ingresos</h4>", unsafe_allow_html=True)
             ingresos_total = 0.0
             
-            for item in st.session_state['ingresos_values']:
+            for idx, item in enumerate(st.session_state['ingresos_values']):
                 col1, col2 = st.columns([3, 1])
                 with col1:
                     st.markdown(f"""
@@ -769,7 +775,7 @@ def main():
                     value = st.text_input(
                         f"{item} ($)", 
                         value=format_currency(st.session_state['ingresos_values'][item]),
-                        key=f"ingreso_{item}",
+                        key=f"ingreso_{idx}_{item}",
                         label_visibility="collapsed"
                     )
                     parsed_value = parse_currency(value)
@@ -780,7 +786,7 @@ def main():
             st.markdown("<h4>Gastos</h4>", unsafe_allow_html=True)
             gastos_total = 0.0
             
-            for item in st.session_state['gastos_values']:
+            for idx, item in enumerate(st.session_state['gastos_values']):
                 col1, col2 = st.columns([3, 1])
                 with col1:
                     st.markdown(f"""
@@ -792,7 +798,7 @@ def main():
                     value = st.text_input(
                         f"{item} ($)", 
                         value=format_currency(st.session_state['gastos_values'][item]),
-                        key=f"gasto_{item}",
+                        key=f"gasto_{idx}_{item}",
                         label_visibility="collapsed"
                     )
                     parsed_value = parse_currency(value)
@@ -813,7 +819,7 @@ def main():
             </div>
             """, unsafe_allow_html=True)
             
-            if st.button("Analizar mi situación financiera"):
+            if st.button("Analizar mi situación financiera", key="analizar_finanzas_btn"):
                 activos_total = total_activos
                 pasivos_total = total_deuda
                 
@@ -866,20 +872,20 @@ def main():
             st.subheader("👴 Plan de Retiro con Bienes Raíces")
             
             col1, col2 = st.columns(2)
-            edad_actual = col1.number_input("Tu edad actual", min_value=18, max_value=100, value=30)
-            edad_retiro = col2.number_input("Edad de retiro deseada", min_value=edad_actual+1, max_value=100, value=65)
+            edad_actual = col1.number_input("Tu edad actual", min_value=18, max_value=100, value=30, key="edad_actual_input")
+            edad_retiro = col2.number_input("Edad de retiro deseada", min_value=edad_actual+1, max_value=100, value=65, key="edad_retiro_input")
             
             ingresos_retiro = parse_currency(
-                st.text_input("Ingresos anuales esperados durante el retiro ($)", value="$40,000")
+                st.text_input("Ingresos anuales esperados durante el retiro ($)", value="$40,000", key="ingresos_retiro_input")
             )
             gastos_retiro = parse_currency(
-                st.text_input("Gastos anuales esperados durante el retiro ($)", value="$30,000")
+                st.text_input("Gastos anuales esperados durante el retiro ($)", value="$30,000", key="gastos_retiro_input")
             )
             ahorros_retiro = parse_currency(
-                st.text_input("Ahorros actuales para el retiro ($)", value="$10,000")
+                st.text_input("Ahorros actuales para el retiro ($)", value="$10,000", key="ahorros_retiro_input")
             )
             
-            if st.button("Calcular proyección de retiro"):
+            if st.button("Calcular proyección de retiro", key="calcular_retiro_btn"):
                 analisis = analizar_proyeccion_retiro_bienes_raices(
                     edad_actual, edad_retiro, ingresos_retiro, gastos_retiro, 
                     ahorros_retiro, st.session_state['datos_financieros']
@@ -906,7 +912,7 @@ def main():
     
     # Botón para descargar PDF
     if 'reporte_data' in st.session_state and st.session_state['reporte_data']['usuario']:
-        if st.button("📄 Descargar Reporte Completo en PDF"):
+        if st.button("📄 Descargar Reporte Completo en PDF", key="descargar_pdf_btn"):
             pdf_bytes = generate_pdf(
                 st.session_state['reporte_data']['usuario'],
                 st.session_state['reporte_data']['finanzas'],
