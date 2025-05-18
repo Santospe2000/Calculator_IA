@@ -575,29 +575,29 @@ def main():
             
             # Lista de activos y pasivos - ESTRUCTURA ORIGINAL RESTAURADA
             activos_items = [
-                {"nombre": "Inmueble 1", "descripcion": "Valor primera propiedad"},
-                {"nombre": "Inmueble 2", "descripcion": "Valor segunda propiedad"},
-                {"nombre": "Automóvil 1", "descripcion": "Valor vehículo principal"},
-                {"nombre": "Automóvil 2", "descripcion": "Valor segundo vehículo"},
-                {"nombre": "Muebles", "descripcion": "Valor de muebles"},
-                {"nombre": "Joyas", "descripcion": "Valor de joyas"},
-                {"nombre": "Arte", "descripcion": "Valor de arte"},
-                {"nombre": "Efectivo cuenta 1", "descripcion": "Saldo cuenta principal"},
-                {"nombre": "Efectivo cuenta 2", "descripcion": "Saldo cuentas secundarias"},
-                {"nombre": "Deudas por cobrar", "descripcion": "Dinero por cobrar"},
-                {"nombre": "Bonos o títulos valores", "descripcion": "Valor de inversiones"},
-                {"nombre": "Fondo de retiro", "descripcion": "Saldo fondo de retiro"},
-                {"nombre": "Bonos o derechos laborales", "descripcion": "Valor prestaciones laborales"}
+                {"nombre": "Inmueble 1", "descripcion": "Valor propiedad 1"},
+                {"nombre": "Inmueble 2", "descripcion": "Valor propiedad 2"},
+                {"nombre": "Automóvil 1", "descripcion": "Valor vehículo 1"},
+                {"nombre": "Automóvil 2", "descripcion": "Valor vehículo 2"},
+                {"nombre": "Muebles", "descripcion": "Valor muebles"},
+                {"nombre": "Joyas", "descripcion": "Valor joyas"},
+                {"nombre": "Arte", "descripcion": "Valor arte"},
+                {"nombre": "Efectivo cuenta 1", "descripcion": "Saldo cuenta 1"},
+                {"nombre": "Efectivo cuenta 2", "descripcion": "Saldo cuenta 2"},
+                {"nombre": "Deudas por cobrar", "descripcion": "Dinero a recibir"},
+                {"nombre": "Bonos o títulos valores", "descripcion": "Valor inversiones"},
+                {"nombre": "Fondo de retiro", "descripcion": "Saldo retiro"},
+                {"nombre": "Bonos o derechos laborales", "descripcion": "Valor laboral"}
             ]
             
             pasivos_items = [
-                {"nombre": "Tarjeta de crédito 1", "descripcion": "Saldo tarjeta principal"},
-                {"nombre": "Tarjeta de crédito 2", "descripcion": "Saldo tarjetas secundarias"},
-                {"nombre": "Tarjeta de crédito 3", "descripcion": "Otras deudas tarjeta"},
+                {"nombre": "Tarjeta de crédito 1", "descripcion": "Saldo principal"},
+                {"nombre": "Tarjeta de crédito 2", "descripcion": "Saldo secundarias"},
+                {"nombre": "Tarjeta de crédito 3", "descripcion": "Otras tarjetas"},
                 {"nombre": "Otra deuda 1", "descripcion": "Préstamos personales"},
-                {"nombre": "Otra deuda 2", "descripcion": "Préstamos educativos"},
-                {"nombre": "Otra deuda 3", "descripcion": "Otras obligaciones"},
-                {"nombre": "Otros", "descripcion": "Otras deudas"}
+                {"nombre": "Otra deuda 2", "descripcion": "Préstamos estudios"},
+                {"nombre": "Otra deuda 3", "descripcion": "Otras deudas"},
+                {"nombre": "Otros", "descripcion": "Más deudas"}
             ]
             
             # Inicializar valores en session_state si no existen
