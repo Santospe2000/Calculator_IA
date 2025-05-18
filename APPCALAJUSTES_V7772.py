@@ -573,7 +573,7 @@ def main():
             
             st.subheader("💰 Activos y Pasivos")
             
-            # Lista de activos y pasivos con descripciones detalladas
+            # Lista de activos y pasivos con tooltips
             activos_items = [
                 {"nombre": "Inmueble 1", "help": "Valor de mercado actual de tu propiedad principal (casa, apartamento o terreno). Incluye apreciación del valor."},
                 {"nombre": "Inmueble 2", "help": "Valor de mercado de tu segunda propiedad (si aplica). Considera propiedades de inversión."},
@@ -607,139 +607,141 @@ def main():
             if 'pasivos_values' not in st.session_state:
                 st.session_state['pasivos_values'] = {item['nombre']: {"valor": 0.0, "deuda": 0.0} for item in pasivos_items}
             
-            # Tabla de activos
-            st.markdown("<h4>Activos</h4>", unsafe_allow_html=True)
-            
-            # Encabezados de tabla
-            cols = st.columns([3, 1, 1, 1])
-            cols[0].markdown("<b>Descripción</b>", unsafe_allow_html=True)
-            cols[1].markdown("<b>Valor ($)</b>", unsafe_allow_html=True)
-            cols[2].markdown("<b>Deuda ($)</b>", unsafe_allow_html=True)
-            cols[3].markdown("<b>Activo Neto ($)</b>", unsafe_allow_html=True)
-            
-            activos_total = {"valor": 0.0, "deuda": 0.0, "neto": 0.0}
-            
-            for item in activos_items:
-                cols = st.columns([3, 1, 1, 1])
-                
-                # Descripción con tooltip
-                with cols[0]:
-                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['help']}</span></span>", unsafe_allow_html=True)
-                
-                # Campos de valor y deuda
-                valor = cols[1].text_input(
-                    f"Valor {item['nombre']}",
-                    value=format_currency(st.session_state['activos_values'][item['nombre']]['valor']),
-                    key=f"activo_valor_{item['nombre']}",
-                    label_visibility="collapsed"
-                )
-                
-                deuda = cols[2].text_input(
-                    f"Deuda {item['nombre']}",
-                    value=format_currency(st.session_state['activos_values'][item['nombre']]['deuda']),
-                    key=f"activo_deuda_{item['nombre']}",
-                    label_visibility="collapsed"
-                )
-                
-                # Calcular activo neto
-                valor_parsed = parse_currency(valor)
-                deuda_parsed = parse_currency(deuda)
-                neto = valor_parsed - deuda_parsed
-                
-                # Mostrar activo neto
-                cols[3].markdown(f"<div style='padding: 0.5rem;'>{format_currency(neto)}</div>", unsafe_allow_html=True)
-                
-                # Actualizar session state y totales
-                st.session_state['activos_values'][item['nombre']] = {
-                    "valor": valor_parsed,
-                    "deuda": deuda_parsed
+            # Crear tabla unificada para activos y pasivos
+            st.markdown("""
+            <style>
+                .asset-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 20px;
                 }
-                
-                activos_total["valor"] += valor_parsed
-                activos_total["deuda"] += deuda_parsed
-                activos_total["neto"] += neto
-            
-            # Tabla de pasivos
-            st.markdown("<h4>Pasivos</h4>", unsafe_allow_html=True)
-            
-            # Encabezados de tabla
-            cols = st.columns([3, 1, 1, 1])
-            cols[0].markdown("<b>Descripción</b>", unsafe_allow_html=True)
-            cols[1].markdown("<b>Valor ($)</b>", unsafe_allow_html=True)
-            cols[2].markdown("<b>Deuda ($)</b>", unsafe_allow_html=True)
-            cols[3].markdown("<b>Activo Neto ($)</b>", unsafe_allow_html=True)
-            
-            pasivos_total = {"valor": 0.0, "deuda": 0.0, "neto": 0.0}
-            
-            for item in pasivos_items:
-                cols = st.columns([3, 1, 1, 1])
-                
-                # Descripción con tooltip
-                with cols[0]:
-                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['help']}</span></span>", unsafe_allow_html=True)
-                
-                # Campos de valor y deuda (para pasivos, valor es el monto total de la deuda)
-                valor = cols[1].text_input(
-                    f"Valor {item['nombre']}",
-                    value=format_currency(st.session_state['pasivos_values'][item['nombre']]['valor']),
-                    key=f"pasivo_valor_{item['nombre']}",
-                    label_visibility="collapsed"
-                )
-                
-                # Para pasivos, la "deuda" sería el saldo pendiente (podría ser igual al valor)
-                deuda = cols[2].text_input(
-                    f"Deuda {item['nombre']}",
-                    value=format_currency(st.session_state['pasivos_values'][item['nombre']]['deuda']),
-                    key=f"pasivo_deuda_{item['nombre']}",
-                    label_visibility="collapsed"
-                )
-                
-                # Calcular activo neto (para pasivos sería negativo)
-                valor_parsed = parse_currency(valor)
-                deuda_parsed = parse_currency(deuda)
-                neto = -(valor_parsed - deuda_parsed)  # Negativo porque son pasivos
-                
-                # Mostrar activo neto
-                cols[3].markdown(f"<div style='padding: 0.5rem;'>{format_currency(neto)}</div>", unsafe_allow_html=True)
-                
-                # Actualizar session state y totales
-                st.session_state['pasivos_values'][item['nombre']] = {
-                    "valor": valor_parsed,
-                    "deuda": deuda_parsed
+                .asset-table th {
+                    background-color: #1E3A8A;
+                    color: white;
+                    padding: 10px;
+                    text-align: left;
                 }
-                
-                pasivos_total["valor"] += valor_parsed
-                pasivos_total["deuda"] += deuda_parsed
-                pasivos_total["neto"] += neto
-            
-            # Mostrar totales
-            st.markdown(f"""
-            <div class="calculator-container">
-                <h4>Totales</h4>
-                <table style="width:100%">
-                    <tr>
-                        <td><strong>Total Valor Activos:</strong></td>
-                        <td>{format_currency(activos_total['valor'])}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Total Deuda Activos:</strong></td>
-                        <td>{format_currency(activos_total['deuda'])}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Total Activos Netos:</strong></td>
-                        <td>{format_currency(activos_total['neto'])}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Total Pasivos:</strong></td>
-                        <td>{format_currency(pasivos_total['neto'])}</td>
-                    </tr>
-                    <tr style="font-weight:bold; background-color:#EFF6FF;">
-                        <td><strong>Patrimonio Neto:</strong></td>
-                        <td>{format_currency(activos_total['neto'] + pasivos_total['neto'])}</td>
-                    </tr>
-                </table>
-            </div>
+                .asset-table td {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                }
+                .asset-table tr:nth-child(even) {
+                    background-color: #f9f9f9;
+                }
+                .asset-table .total-row {
+                    background-color: #EFF6FF;
+                    font-weight: bold;
+                }
+                .currency-input {
+                    width: 100%;
+                    padding: 5px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    text-align: right;
+                }
+            </style>
             """, unsafe_allow_html=True)
+            
+            # Tabla unificada
+            st.markdown("""
+            <table class="asset-table">
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Valor ($)</th>
+                        <th>Deuda ($)</th>
+                        <th>Activo ($)</th>
+                    </tr>
+                </thead>
+                <tbody>
+            """, unsafe_allow_html=True)
+            
+            total_valor = 0.0
+            total_deuda = 0.0
+            total_activo = 0.0
+            
+            # Filas para activos
+            for item in activos_items:
+                # Obtener valores del session state o inicializar
+                valor = st.session_state['activos_values'][item['nombre']]['valor']
+                deuda = st.session_state['activos_values'][item['nombre']]['deuda']
+                activo = valor - deuda
+                
+                total_valor += valor
+                total_deuda += deuda
+                total_activo += activo
+                
+                st.markdown(f"""
+                <tr>
+                    <td>{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['help']}</span></span></td>
+                    <td><input type="text" class="currency-input" id="val_{item['nombre']}" value="{format_currency(valor)}" onchange="updateValor('{item['nombre']}', 'val_{item['nombre']}', 'activo')"></td>
+                    <td><input type="text" class="currency-input" id="deu_{item['nombre']}" value="{format_currency(deuda)}" onchange="updateValor('{item['nombre']}', 'deu_{item['nombre']}', 'activo')"></td>
+                    <td>{format_currency(activo)}</td>
+                </tr>
+                """, unsafe_allow_html=True)
+            
+            # Filas para pasivos (mostrados como negativos)
+            for item in pasivos_items:
+                # Obtener valores del session state o inicializar
+                valor = st.session_state['pasivos_values'][item['nombre']]['valor']
+                deuda = st.session_state['pasivos_values'][item['nombre']]['deuda']
+                activo = -(valor - deuda)  # Negativo porque son pasivos
+                
+                total_valor += valor
+                total_deuda += deuda
+                total_activo += activo
+                
+                st.markdown(f"""
+                <tr>
+                    <td>{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['help']}</span></span></td>
+                    <td><input type="text" class="currency-input" id="val_{item['nombre']}" value="{format_currency(valor)}" onchange="updateValor('{item['nombre']}', 'val_{item['nombre']}', 'pasivo')"></td>
+                    <td><input type="text" class="currency-input" id="deu_{item['nombre']}" value="{format_currency(deuda)}" onchange="updateValor('{item['nombre']}', 'deu_{item['nombre']}', 'pasivo')"></td>
+                    <td>{format_currency(activo)}</td>
+                </tr>
+                """, unsafe_allow_html=True)
+            
+            # Fila de totales
+            st.markdown(f"""
+            <tr class="total-row">
+                <td><strong>Total</strong></td>
+                <td><strong>{format_currency(total_valor)}</strong></td>
+                <td><strong>{format_currency(total_deuda)}</strong></td>
+                <td><strong>{format_currency(total_activo)}</strong></td>
+            </tr>
+            </tbody>
+            </table>
+            
+            <script>
+            function updateValor(nombre, elementId, tipo) {{
+                var valor = document.getElementById(elementId).value;
+                // Enviar el valor actualizado a Streamlit
+                Streamlit.setComponentValue({{type: "update", nombre: nombre, valor: valor, element: elementId, tipo: tipo}});
+            }}
+            </script>
+            """, unsafe_allow_html=True)
+            
+            # Manejar actualizaciones de valores desde JavaScript
+            if st.session_state.get('update_values'):
+                update_data = st.session_state.update_values
+                nombre = update_data['nombre']
+                valor = parse_currency(update_data['valor'])
+                element = update_data['element']
+                tipo = update_data['tipo']
+                
+                if tipo == 'activo':
+                    if element.startswith('val_'):
+                        st.session_state['activos_values'][nombre]['valor'] = valor
+                    else:
+                        st.session_state['activos_values'][nombre]['deuda'] = valor
+                else:
+                    if element.startswith('val_'):
+                        st.session_state['pasivos_values'][nombre]['valor'] = valor
+                    else:
+                        st.session_state['pasivos_values'][nombre]['deuda'] = valor
+                
+                # Limpiar el estado para evitar bucles
+                st.session_state.update_values = None
+                st.experimental_rerun()
             
             # Flujo de caja mensual
             st.subheader("💸 Flujo de Caja Mensual")
@@ -847,21 +849,22 @@ def main():
             
             if st.button("Analizar mi situación financiera para bienes raíces"):
                 # Calcular total de activos netos (suma de activos netos + pasivos netos)
-                total_activos_netos = activos_total['neto'] + pasivos_total['neto']
+                total_activos_netos = total_activo
+                total_pasivos = abs(sum([v['valor'] - v['deuda'] for v in st.session_state['pasivos_values'].values()]))
                 
-                st.session_state['datos_financieros'] = (ingresos_total, gastos_total, total_activos_netos, abs(pasivos_total['neto']))
-                analisis = analizar_situacion_financiera(ingresos_total, gastos_total, total_activos_netos, abs(pasivos_total['neto']))
+                st.session_state['datos_financieros'] = (ingresos_total, gastos_total, total_activos_netos, total_pasivos)
+                analisis = analizar_situacion_financiera(ingresos_total, gastos_total, total_activos_netos, total_pasivos)
                 st.session_state['reporte_data']['finanzas'] = {
                     'ingresos': ingresos_total,
                     'gastos': gastos_total,
                     'activos': total_activos_netos,
-                    'pasivos': abs(pasivos_total['neto'])
+                    'pasivos': total_pasivos
                 }
                 st.session_state['reporte_data']['analisis']['resumen'] = analisis['resumen']
                 st.session_state['reporte_data']['analisis']['perfil_inversion'] = analisis['perfil_inversion']
                 
                 # Generar y mostrar plan de trabajo específico para bienes raíces
-                plan = generar_plan_trabajo(ingresos_total, gastos_total, total_activos_netos, abs(pasivos_total['neto']))
+                plan = generar_plan_trabajo(ingresos_total, gastos_total, total_activos_netos, total_pasivos)
                 st.subheader("📝 Plan de Trabajo para Inversión en Bienes Raíces")
                 st.write(plan)
                 st.session_state['reporte_data']['analisis']['plan_trabajo'] = plan
