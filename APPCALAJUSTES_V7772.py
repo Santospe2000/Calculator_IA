@@ -516,7 +516,7 @@ def main():
     # Encabezado con logo
     st.markdown("""
     <div class="header-container">
-        <img src="https://raw.githubusercontent.com/tallerdebienesraices/calculadora/main/logo_tbr.png" class="logo" alt="Logo Taller Bienes Raíces">
+        <img src="https://via.placeholder.com/60" class="logo" alt="Logo Taller Bienes Raíces">
         <div>
             <h1 style="margin:0;color:#1E3A8A;">Taller de Bienes Raíces</h1>
             <h3 style="margin:0;color:#6B7280;">Calculadora Financiera para Inversión Inmobiliaria</h3>
@@ -573,32 +573,31 @@ def main():
             
             st.subheader("💰 Activos y Pasivos")
             
-            # Lista de activos con descripciones mejoradas
+            # Lista de activos y pasivos con descripciones detalladas
             activos_items = [
-                {"nombre": "Inmueble 1", "descripcion": "Valor de mercado actual de tu vivienda principal o primera propiedad"},
-                {"nombre": "Inmueble 2", "descripcion": "Valor de mercado de tu segunda vivienda o propiedad de inversión"},
-                {"nombre": "Automóvil 1", "descripcion": "Valor actual de tu vehículo principal según precios de mercado"},
-                {"nombre": "Automóvil 2", "descripcion": "Valor actual de tu segundo vehículo si posees más de uno"},
-                {"nombre": "Muebles", "descripcion": "Valor estimado de tus muebles y electrodomésticos"},
-                {"nombre": "Joyas", "descripcion": "Valor aproximado de tus joyas, relojes y artículos de valor"},
-                {"nombre": "Arte", "descripcion": "Valor de mercado de tus obras de arte, antigüedades o colecciones"},
-                {"nombre": "Efectivo cuenta 1", "descripcion": "Saldo disponible en tu cuenta corriente o de ahorros principal"},
-                {"nombre": "Efectivo cuenta 2", "descripcion": "Saldo disponible en otras cuentas bancarias secundarias"},
-                {"nombre": "Deudas por cobrar", "descripcion": "Dinero que te deben personas o empresas (préstamos otorgados)"},
-                {"nombre": "Bonos o títulos valores", "descripcion": "Valor actual de tus inversiones en bonos o instrumentos financieros"},
-                {"nombre": "Fondo de retiro", "descripcion": "Saldo acumulado en tus fondos de pensiones o planes de retiro"},
-                {"nombre": "Bonos o derechos laborales", "descripcion": "Valor de prestaciones sociales o beneficios laborales por recibir"}
+                {"nombre": "Inmueble 1", "help": "Valor de mercado actual de tu propiedad principal (casa, apartamento o terreno). Incluye apreciación del valor."},
+                {"nombre": "Inmueble 2", "help": "Valor de mercado de tu segunda propiedad (si aplica). Considera propiedades de inversión."},
+                {"nombre": "Automóvil 1", "help": "Valor actual de tu vehículo principal según tasación o valor de mercado."},
+                {"nombre": "Automóvil 2", "help": "Valor actual de tu segundo vehículo (si aplica). Considera depreciación."},
+                {"nombre": "Muebles", "help": "Valor estimado de muebles y enseres en buen estado. No incluir objetos personales."},
+                {"nombre": "Joyas", "help": "Valor tasado de joyas y artículos de valor. Basado en valor real no sentimental."},
+                {"nombre": "Arte", "help": "Valor estimado de obras de arte y colecciones con valor de mercado."},
+                {"nombre": "Efectivo cuenta 1", "help": "Saldo disponible en cuentas corrientes y de ahorros principales."},
+                {"nombre": "Efectivo cuenta 2", "help": "Saldo disponible en cuentas secundarias o de inversión a corto plazo."},
+                {"nombre": "Deudas por cobrar", "help": "Dinero que te deben otras personas o empresas con alta probabilidad de pago."},
+                {"nombre": "Bonos o títulos valores", "help": "Valor actual de tus inversiones en instrumentos financieros."},
+                {"nombre": "Fondo de retiro", "help": "Saldo acumulado en fondos de pensiones y planes de retiro."},
+                {"nombre": "Bonos o derechos laborales", "help": "Valor de prestaciones laborales acumuladas (cesantías, primas)."}
             ]
             
-            # Lista de pasivos con descripciones mejoradas
             pasivos_items = [
-                {"nombre": "Tarjeta de crédito 1", "descripcion": "Saldo total adeudado en tu tarjeta de crédito principal"},
-                {"nombre": "Tarjeta de crédito 2", "descripcion": "Saldo pendiente en tus tarjetas de crédito adicionales"},
-                {"nombre": "Tarjeta de crédito 3", "descripcion": "Saldo en otras tarjetas de crédito que poseas"},
-                {"nombre": "Otra deuda 1", "descripcion": "Préstamos personales o créditos de consumo pendientes de pago"},
-                {"nombre": "Otra deuda 2", "descripcion": "Préstamos estudiantiles o financiamiento educativo por pagar"},
-                {"nombre": "Otra deuda 3", "descripcion": "Otras obligaciones financieras no incluidas en las categorías anteriores"},
-                {"nombre": "Otros", "descripcion": "Cualquier otra deuda o compromiso financiero no clasificado"}
+                {"nombre": "Tarjeta de crédito 1", "help": "Saldo pendiente en tu tarjeta principal incluyendo intereses acumulados."},
+                {"nombre": "Tarjeta de crédito 2", "help": "Saldo pendiente en tarjetas secundarias con deuda activa."},
+                {"nombre": "Tarjeta de crédito 3", "help": "Otras deudas con tarjetas de crédito no incluidas anteriormente."},
+                {"nombre": "Otra deuda 1", "help": "Préstamos personales, de consumo o créditos rotativos vigentes."},
+                {"nombre": "Otra deuda 2", "help": "Préstamos estudiantiles o educativos con saldo pendiente."},
+                {"nombre": "Otra deuda 3", "help": "Otras obligaciones financieras no clasificadas (familiares, informales)."},
+                {"nombre": "Otros", "help": "Cualquier otra deuda no incluida en las categorías anteriores."}
             ]
             
             # Inicializar valores en session_state si no existen
@@ -625,7 +624,7 @@ def main():
                 
                 # Descripción con tooltip
                 with cols[0]:
-                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['descripcion']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['help']}</span></span>", unsafe_allow_html=True)
                 
                 # Campos de valor y deuda
                 valor = cols[1].text_input(
@@ -677,7 +676,7 @@ def main():
                 
                 # Descripción con tooltip
                 with cols[0]:
-                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['descripcion']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['help']}</span></span>", unsafe_allow_html=True)
                 
                 # Campos de valor y deuda (para pasivos, valor es el monto total de la deuda)
                 valor = cols[1].text_input(
@@ -760,23 +759,23 @@ def main():
             # Inicializar valores en session_state si no existen
             if 'ingresos_values' not in st.session_state:
                 st.session_state['ingresos_values'] = {
-                    "Ingresos mensuales adulto 1": {"valor": 0.0, "descripcion": "Salario, honorarios o ingresos principales del primer adulto en el hogar"},
-                    "Ingresos mensuales adulto 2": {"valor": 0.0, "descripcion": "Salario, honorarios o ingresos principales del segundo adulto en el hogar (si aplica)"},
-                    "Otros ingresos": {"valor": 0.0, "descripcion": "Ingresos adicionales como arriendos, inversiones, negocios secundarios"}
+                    "Ingresos mensuales adulto 1": {"valor": 0.0, "help": "Salario neto, honorarios o ingresos principales del primer adulto en el hogar después de impuestos."},
+                    "Ingresos mensuales adulto 2": {"valor": 0.0, "help": "Salario neto o ingresos del segundo adulto en el hogar (si aplica). Incluye ingresos fijos."},
+                    "Otros ingresos": {"valor": 0.0, "help": "Ingresos adicionales como arriendos, dividendos, negocios secundarios o ingresos variables."}
                 }
             
             if 'gastos_values' not in st.session_state:
                 st.session_state['gastos_values'] = {
-                    "Gasto de Inmueble 1": {"valor": 0.0, "descripcion": "Hipoteca, administración, impuestos y mantenimiento de tu vivienda principal"},
-                    "Gasto de Inmueble 2": {"valor": 0.0, "descripcion": "Hipoteca, administración, impuestos y mantenimiento de tu segunda propiedad (si aplica)"},
-                    "Alimentación": {"valor": 0.0, "descripcion": "Supermercado, restaurantes y gastos de comida en general"},
-                    "Educación": {"valor": 0.0, "descripcion": "Colegiatura, universidad, cursos y materiales educativos"},
-                    "Transporte": {"valor": 0.0, "descripcion": "Gasolina, transporte público, mantenimiento vehicular"},
-                    "Salud": {"valor": 0.0, "descripcion": "Seguros médicos, medicinas, consultas"},
-                    "Entretenimiento": {"valor": 0.0, "descripcion": "Salidas, viajes, suscripciones (Netflix, etc.)"},
-                    "Servicios públicos": {"valor": 0.0, "descripcion": "Agua, luz, gas, internet, teléfono"},
-                    "Seguros": {"valor": 0.0, "descripcion": "Seguro de vida, vehicular, hogar"},
-                    "Otros gastos": {"valor": 0.0, "descripcion": "Cualquier otro gasto no clasificado"}
+                    "Gasto de Inmueble 1": {"valor": 0.0, "help": "Hipoteca, administración, impuestos prediales, seguros y mantenimiento de tu vivienda principal."},
+                    "Gasto de Inmueble 2": {"valor": 0.0, "help": "Hipoteca y costos asociados a tu segunda propiedad (si aplica). Incluye vacantes en propiedades de alquiler."},
+                    "Alimentación": {"valor": 0.0, "help": "Supermercado, restaurantes y gastos de comida en general. Incluye despensa y alimentos fuera de casa."},
+                    "Educación": {"valor": 0.0, "help": "Colegiatura, universidad, cursos, materiales educativos y actividades extracurriculares."},
+                    "Transporte": {"valor": 0.0, "help": "Gasolina, transporte público, mantenimiento vehicular, parqueaderos y peajes."},
+                    "Salud": {"valor": 0.0, "help": "Seguros médicos, medicinas, consultas, exámenes y gastos médicos no cubiertos."},
+                    "Entretenimiento": {"valor": 0.0, "help": "Salidas, viajes, suscripciones (streaming, revistas), hobbies y actividades recreativas."},
+                    "Servicios públicos": {"valor": 0.0, "help": "Agua, luz, gas, internet, teléfono fijo y móvil, cable y otros servicios básicos."},
+                    "Seguros": {"valor": 0.0, "help": "Primas de seguros de vida, vehicular, hogar, salud y otros seguros no médicos."},
+                    "Otros gastos": {"valor": 0.0, "help": "Gastos varios no clasificados: ropa, cuidado personal, regalos, donaciones, etc."}
                 }
             
             # Ingresos
@@ -786,7 +785,7 @@ def main():
             for item, data in st.session_state['ingresos_values'].items():
                 cols = st.columns([4, 1])
                 with cols[0]:
-                    st.markdown(f"{item} <span class='help-icon'>?<span class='help-text'>{data['descripcion']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item} <span class='help-icon'>?<span class='help-text'>{data['help']}</span></span>", unsafe_allow_html=True)
                 
                 value = cols[1].text_input(
                     f"{item} ($)",
@@ -805,7 +804,7 @@ def main():
             for item, data in st.session_state['gastos_values'].items():
                 cols = st.columns([4, 1])
                 with cols[0]:
-                    st.markdown(f"{item} <span class='help-icon'>?<span class='help-text'>{data['descripcion']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item} <span class='help-icon'>?<span class='help-text'>{data['help']}</span></span>", unsafe_allow_html=True)
                 
                 value = cols[1].text_input(
                     f"{item} ($)",
