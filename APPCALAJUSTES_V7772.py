@@ -573,12 +573,12 @@ def main():
             
             st.subheader("💰 Activos y Pasivos")
             
-            # Lista de activos y pasivos con tooltips - AJUSTE SOLICITADO 1 (MANTENIENDO ESTRUCTURA ORIGINAL)
+            # Lista de activos y pasivos - ESTRUCTURA ORIGINAL RESTAURADA
             activos_items = [
-                {"nombre": "Inmueble 1", "descripcion": "Valor de mercado de tu primera propiedad"},
-                {"nombre": "Inmueble 2", "descripcion": "Valor de mercado de tu segunda propiedad"},
+                {"nombre": "Inmueble 1", "descripcion": "Valor de mercado de tu primera propiedad (casa, apartamento, terreno)"},
+                {"nombre": "Inmueble 2", "descripcion": "Valor de mercado de tu segunda propiedad (si aplica)"},
                 {"nombre": "Automóvil 1", "descripcion": "Valor actual de tu vehículo principal"},
-                {"nombre": "Automóvil 2", "descripcion": "Valor actual de tu segundo vehículo"},
+                {"nombre": "Automóvil 2", "descripcion": "Valor actual de tu segundo vehículo (si aplica)"},
                 {"nombre": "Muebles", "descripcion": "Valor estimado de muebles y enseres"},
                 {"nombre": "Joyas", "descripcion": "Valor estimado de joyas y artículos de valor"},
                 {"nombre": "Arte", "descripcion": "Valor estimado de obras de arte y colecciones"},
@@ -622,7 +622,7 @@ def main():
             for item in activos_items:
                 cols = st.columns([3, 1, 1, 1])
                 
-                # Descripción con tooltip
+                # Descripción con tooltip - AJUSTE SOLICITADO 1 (DESCRIPCIONES SIN SIGNOS DE INTERROGACIÓN)
                 with cols[0]:
                     st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['descripcion']}</span></span>", unsafe_allow_html=True)
                 
@@ -674,7 +674,7 @@ def main():
             for item in pasivos_items:
                 cols = st.columns([3, 1, 1, 1])
                 
-                # Descripción con tooltip
+                # Descripción con tooltip - AJUSTE SOLICITADO 1 (DESCRIPCIONES SIN SIGNOS DE INTERROGACIÓN)
                 with cols[0]:
                     st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['descripcion']}</span></span>", unsafe_allow_html=True)
                 
@@ -760,14 +760,14 @@ def main():
             if 'ingresos_values' not in st.session_state:
                 st.session_state['ingresos_values'] = {
                     "Ingresos mensuales adulto 1": {"valor": 0.0, "descripcion": "Salario, honorarios o ingresos principales del primer adulto en el hogar"},
-                    "Ingresos mensuales adulto 2": {"valor": 0.0, "descripcion": "Salario, honorarios o ingresos principales del segundo adulto en el hogar"},
+                    "Ingresos mensuales adulto 2": {"valor": 0.0, "descripcion": "Salario, honorarios o ingresos principales del segundo adulto en el hogar (si aplica)"},
                     "Otros ingresos": {"valor": 0.0, "descripcion": "Ingresos adicionales como arriendos, inversiones, negocios secundarios"}
                 }
             
             if 'gastos_values' not in st.session_state:
                 st.session_state['gastos_values'] = {
                     "Gasto de Inmueble 1": {"valor": 0.0, "descripcion": "Hipoteca, administración, impuestos y mantenimiento de tu vivienda principal"},
-                    "Gasto de Inmueble 2": {"valor": 0.0, "descripcion": "Hipoteca, administración, impuestos y mantenimiento de tu segunda propiedad"},
+                    "Gasto de Inmueble 2": {"valor": 0.0, "descripcion": "Hipoteca, administración, impuestos y mantenimiento de tu segunda propiedad (si aplica)"},
                     "Alimentación": {"valor": 0.0, "descripcion": "Supermercado, restaurantes y gastos de comida en general"},
                     "Educación": {"valor": 0.0, "descripcion": "Colegiatura, universidad, cursos y materiales educativos"},
                     "Transporte": {"valor": 0.0, "descripcion": "Gasolina, transporte público, mantenimiento vehicular"},
