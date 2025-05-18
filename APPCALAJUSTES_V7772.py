@@ -7,7 +7,7 @@ from io import BytesIO
 import re
 import os
 
-# Configuración inicial de la página
+# Configuración inicial de la página DEBE SER LO PRIMERO
 st.set_page_config(
     page_title="Taller de Bienes Raíces",
     page_icon="💰",
@@ -15,10 +15,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Logo en base64 (aaaaa.png)
-LOGO_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AkEEjIZJ3zJ9QAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAJklEQVQ4y2NgGAWjYBSMglEwCkbBKBgFgw0wQjVfYGBg+D8QNQEAL1QBdQdXg0QAAAAASUVORK5CYII="
-
-# Configuración del cliente de OpenAI
+# Configuración del cliente de OpenAI (versión segura)
 client = None
 if 'OPENAI_API_KEY' in st.secrets:
     try:
@@ -31,7 +28,7 @@ else:
     st.warning("Funcionalidad de IA limitada - No se configuró OPENAI_API_KEY")
     st.session_state['openai_configured'] = False
 
-# Estilos CSS personalizados
+# Estilos CSS personalizados para el formato de calculadora financiera
 def load_css():
     st.markdown("""
     <style>
@@ -83,38 +80,204 @@ def load_css():
             color: white;
         }
         
-        .field-description {
-            font-size: 0.85rem;
-            color: var(--gris);
-            margin-top: -10px;
-            margin-bottom: 10px;
+        .stTextInput>div>div>input, 
+        .stNumberInput>div>div>input,
+        .stSelectbox>div>div>select,
+        .stMultiselect>div>div>div {
+            border-radius: 8px;
+            border: 1px solid var(--gris);
+        }
+        
+        .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
+            color: var(--azul-oscuro);
+        }
+        
+        .stMetric {
+            border-left: 4px solid var(--azul-oscuro);
+            padding-left: 12px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .positive-value {
+            color: var(--verde);
+            font-weight: bold;
+        }
+        
+        .negative-value {
+            color: var(--rojo);
+            font-weight: bold;
+        }
+        
+        .data-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .data-table th {
+            background-color: var(--azul-oscuro);
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .data-table input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .data-table .total-row {
+            background-color: #EFF6FF;
+            font-weight: bold;
+        }
+        
+        .tips-container {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--azul-oscuro);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .help-icon {
+            color: var(--azul-oscuro);
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .help-text {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid var(--gris);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            width: 300px;
+        }
+        
+        .help-icon:hover + .help-text {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .help-text {
+                width: 200px;
+                font-size: 12px;
+            }
         }
     </style>
     """, unsafe_allow_html=True)
 
-# Función para mostrar el encabezado con logo
-def show_header():
-    st.markdown(f"""
-    <div class="header-container">
-        <img src="data:image/png;base64,{LOGO_BASE64}" class="logo" alt="Logo Taller Bienes Raíces">
-        <div>
-            <h1 style="margin:0;color:#1E3A8A;">Taller de Bienes Raíces</h1>
-            <h3 style="margin:0;color:#6B7280;">Calculadora Financiera para Inversión Inmobiliaria</h3>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# Funciones auxiliares
+# Función para formatear números como moneda
 def format_currency(value):
     return f"${value:,.2f}" if value else "$0.00"
 
+# Función para extraer el valor numérico de un string de moneda
 def parse_currency(currency_str):
     if not currency_str:
         return 0.0
+    # Eliminar símbolos de moneda y comas
     num_str = re.sub(r'[^\d.]', '', currency_str)
     return float(num_str) if num_str else 0.0
 
-# Funciones de base de datos
+# Función para generar PDF
+def generate_pdf(usuario_data, finanzas_data, analisis_data):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    # Encabezado
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(200, 10, txt="Informe Financiero - Taller de Bienes Raíces", ln=1, align='C')
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(200, 10, txt="Análisis de Inversión en Bienes Raíces", ln=1, align='C')
+    pdf.ln(10)
+    
+    # Datos personales
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(200, 10, txt="Datos Personales:", ln=1)
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 10, txt=f"Nombre: {usuario_data.get('nombre', '')}", ln=1)
+    pdf.cell(200, 10, txt=f"Edad: {usuario_data.get('edad', '')}", ln=1)
+    pdf.cell(200, 10, txt=f"Email: {usuario_data.get('email', '')}", ln=1)
+    pdf.ln(5)
+    
+    # Datos financieros
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(200, 10, txt="Situación Financiera:", ln=1)
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 10, txt=f"Ingresos Mensuales: {format_currency(finanzas_data.get('ingresos', 0))}", ln=1)
+    pdf.cell(200, 10, txt=f"Gastos Mensuales: {format_currency(finanzas_data.get('gastos', 0))}", ln=1)
+    pdf.cell(200, 10, txt=f"Activos Totales: {format_currency(finanzas_data.get('activos', 0))}", ln=1)
+    pdf.cell(200, 10, txt=f"Pasivos Totales: {format_currency(finanzas_data.get('pasivos', 0))}", ln=1)
+    pdf.ln(5)
+    
+    # Perfil de inversión
+    if 'perfil_inversion' in analisis_data:
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(200, 10, txt=f"Perfil de Inversión en Bienes Raíces: {analisis_data['perfil_inversion']['nivel']}", ln=1)
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(0, 10, txt=analisis_data['perfil_inversion']['descripcion'])
+        pdf.ln(5)
+    
+    # Análisis
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(200, 10, txt="Análisis y Recomendaciones:", ln=1)
+    pdf.set_font("Arial", size=12)
+    pdf.multi_cell(0, 10, txt=analisis_data.get('resumen', ''))
+    pdf.ln(5)
+    
+    # Plan de trabajo
+    if 'plan_trabajo' in analisis_data:
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(200, 10, txt="Plan de Trabajo Personalizado:", ln=1)
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(0, 10, txt=analisis_data['plan_trabajo'])
+    
+    # Recomendaciones de cursos
+    if 'recomendaciones_cursos' in analisis_data:
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(200, 10, txt="Recomendaciones de Educación Financiera:", ln=1)
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(0, 10, txt=analisis_data['recomendaciones_cursos'])
+    
+    # Generar el PDF en memoria
+    pdf_output = BytesIO()
+    pdf.output(pdf_output)
+    pdf_bytes = pdf_output.getvalue()
+    pdf_output.close()
+    
+    return pdf_bytes
+
+# Crear la base de datos y la tabla de usuarios
 def crear_base_datos():
     conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
@@ -141,6 +304,7 @@ def crear_base_datos():
     conn.commit()
     conn.close()
 
+# Registrar un nuevo usuario
 def registrar_usuario(nombre, edad, email, telefono):
     if edad < 18:
         st.warning("Debes ser mayor de 18 años para usar este programa.")
@@ -156,20 +320,120 @@ def registrar_usuario(nombre, edad, email, telefono):
     conn.close()
     return usuario_id
 
-# Funciones de análisis financiero
+# Función para analizar la proyección de retiro con enfoque en bienes raíces
+def analizar_proyeccion_retiro(edad_actual, edad_retiro, ingresos_retiro, gastos_retiro, ahorros_retiro, patrimonio_neto, flujo_caja):
+    años_ahorro = edad_retiro - edad_actual
+    necesidad_total = (ingresos_retiro - gastos_retiro) * (100 - edad_retiro)  # Estimación simplificada
+    ahorro_necesario_anual = (necesidad_total - ahorros_retiro) / años_ahorro if años_ahorro > 0 else 0
+    
+    # Análisis específico para bienes raíces
+    recomendaciones = []
+    cursos_recomendados = []
+    
+    if patrimonio_neto > 50000 and flujo_caja > 1000:
+        nivel = "Alto"
+        recomendaciones.append("Tienes un excelente perfil para comenzar a invertir en bienes raíces de inmediato.")
+        recomendaciones.append("Considera propiedades generadoras de ingresos pasivos como apartamentos en arriendo o locales comerciales.")
+        cursos_recomendados.append("Curso Avanzado de Inversión en Bienes Raíces")
+    elif patrimonio_neto > 20000 and flujo_caja > 500:
+        nivel = "Medio"
+        recomendaciones.append("Tienes potencial para inversión en bienes raíces, pero necesitas mejorar tu flujo de caja.")
+        recomendaciones.append("Considera comenzar con propiedades pequeñas o co-inversiones.")
+        cursos_recomendados.append("Curso Intermedio de Bienes Raíces")
+    else:
+        nivel = "Bajo"
+        recomendaciones.append("Necesitas fortalecer tu situación financiera antes de invertir en bienes raíces.")
+        recomendaciones.append("Enfócate en aumentar tus ingresos y reducir deudas.")
+        cursos_recomendados.append("Curso Básico de Educación Financiera para Bienes Raíces")
+    
+    recomendaciones.append("\nTe recomendamos estos recursos educativos:")
+    recomendaciones.append("- https://www.youtube.com/@carlosdevis")
+    recomendaciones.append("- https://landing.tallerdebienesraices.com/registro-ciclo-educativo/")
+    
+    return {
+        "años_ahorro": años_ahorro,
+        "necesidad_total": necesidad_total,
+        "ahorro_necesario_anual": ahorro_necesario_anual,
+        "nivel_inversion": nivel,
+        "analisis": f"""
+        Proyección de Retiro con Enfoque en Bienes Raíces:
+        - Años hasta el retiro: {años_ahorro}
+        - Necesidad total estimada: {format_currency(necesidad_total)}
+        - Ahorros actuales: {format_currency(ahorros_retiro)}
+        - Necesitas ahorrar aproximadamente {format_currency(ahorro_necesario_anual)} anuales para alcanzar tu meta.
+        
+        Perfil de Inversión: {nivel}
+        
+        Recomendaciones Específicas:
+        {chr(10).join(recomendaciones)}
+        
+        Cursos Recomendados:
+        {chr(10).join(cursos_recomendados)}
+        """
+    }
+
+# Calcular y mostrar el análisis financiero con enfoque en bienes raíces
 def analizar_situacion_financiera(ingresos, gastos, activos, pasivos):
     flujo_caja_mensual = ingresos - gastos
     patrimonio_neto = activos - pasivos
     
+    # Determinar perfil de inversión en bienes raíces
     if patrimonio_neto > 50000 and flujo_caja_mensual > 1000:
         perfil = "Alto (70-100%)"
-        descripcion = "Excelente perfil para inversión en bienes raíces."
+        descripcion = "Excelente perfil para inversión en bienes raíces. Tienes la capacidad financiera para comenzar a invertir en propiedades generadoras de ingresos pasivos."
     elif patrimonio_neto > 20000 and flujo_caja_mensual > 500:
         perfil = "Medio (40-69%)"
-        descripcion = "Buen potencial para inversión en bienes raíces."
+        descripcion = "Buen potencial para inversión en bienes raíces. Considera comenzar con propiedades pequeñas o co-inversiones mientras mejoras tu flujo de caja."
     else:
         perfil = "Bajo (0-39%)"
-        descripcion = "Enfócate en mejorar tu situación financiera."
+        descripcion = "Necesitas fortalecer tu situación financiera antes de invertir en bienes raíces. Enfócate en aumentar ingresos, reducir deudas y ahorrar."
+    
+    st.subheader("📊 Análisis Resumen de tu Situación Financiera")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.metric("Ingresos Mensuales", format_currency(ingresos))
+        st.metric("Gastos Mensuales", format_currency(gastos))
+        st.metric("Flujo de Caja Mensual", format_currency(flujo_caja_mensual), 
+                 delta="Positivo" if flujo_caja_mensual > 0 else "Negativo",
+                 delta_color="normal" if flujo_caja_mensual > 0 else "inverse")
+    
+    with col2:
+        st.metric("Activos Totales", format_currency(activos))
+        st.metric("Pasivos Totales", format_currency(pasivos))
+        st.metric("Patrimonio Neto", format_currency(patrimonio_neto), 
+                 delta="Positivo" if patrimonio_neto > 0 else "Negativo",
+                 delta_color="normal" if patrimonio_neto > 0 else "inverse")
+    
+    st.subheader("🏡 Perfil de Inversión en Bienes Raíces")
+    st.markdown(f"""
+    <div class="calculator-container">
+        <h4>Nivel: {perfil}</h4>
+        <p>{descripcion}</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.subheader("🔍 Análisis Específico para Bienes Raíces")
+    if flujo_caja_mensual > 0:
+        st.success(f"Flujo de caja positivo de {format_currency(flujo_caja_mensual)}/mes. Podrías destinar parte de este excedente a inversión en propiedades.")
+    else:
+        st.error(f"Flujo de caja negativo de {format_currency(flujo_caja_mensual)}/mes. Necesitas equilibrar tus finanzas antes de considerar inversiones.")
+    
+    if patrimonio_neto > 50000:
+        st.success("Patrimonio neto sólido. Podrías usar parte como garantía para financiamiento de propiedades.")
+    elif patrimonio_neto > 0:
+        st.warning("Patrimonio neto positivo pero modesto. Considera estrategias de bajo riesgo como alquiler de habitaciones.")
+    else:
+        st.error("Patrimonio neto negativo. Enfócate en reducir deudas antes de invertir.")
+    
+    st.subheader("🚀 Acciones Recomendadas para Bienes Raíces")
+    st.write("""
+    1. **Analiza tu capacidad de endeudamiento** para financiamiento hipotecario
+    2. **Explora opciones de co-inversión** si tu capital es limitado
+    3. **Considera propiedades con múltiples fuentes de ingreso** (alquiler, parking, lavandería)
+    4. **Estudia el mercado local** para identificar oportunidades
+    5. **Asiste a nuestros talleres** para aprender estrategias específicas
+    """)
     
     return {
         "flujo_caja": flujo_caja_mensual,
@@ -179,253 +443,596 @@ def analizar_situacion_financiera(ingresos, gastos, activos, pasivos):
             "descripcion": descripcion
         },
         "resumen": f"""
-        **Resumen Financiero:**
+        Situación Financiera Actual:
+        - Ingresos Mensuales: {format_currency(ingresos)}
+        - Gastos Mensuales: {format_currency(gastos)}
+        - Flujo de Caja: {format_currency(flujo_caja_mensual)} ({'Positivo' if flujo_caja_mensual > 0 else 'Negativo'})
+        - Activos Totales: {format_currency(activos)}
+        - Pasivos Totales: {format_currency(pasivos)}
+        - Patrimonio Neto: {format_currency(patrimonio_neto)} ({'Positivo' if patrimonio_neto > 0 else 'Negativo'})
         
-        - **Ingresos Mensuales:** {format_currency(ingresos)}
-        - **Gastos Mensuales:** {format_currency(gastos)}
-        - **Flujo de Caja:** {format_currency(flujo_caja_mensual)} ({'Positivo' if flujo_caja_mensual > 0 else 'Negativo'})
-        - **Patrimonio Neto:** {format_currency(patrimonio_neto)}
-        
-        **Perfil de Inversión:** {perfil}
+        Perfil de Inversión en Bienes Raíces: {perfil}
         {descripcion}
+        
+        Análisis:
+        {'Tienes un flujo de caja positivo que podrías destinar a inversión en propiedades.' if flujo_caja_mensual > 0 else 'Necesitas equilibrar tu flujo de caja antes de considerar inversiones.'}
+        {'Tu patrimonio neto es sólido y podrías usarlo como garantía para financiamiento.' if patrimonio_neto > 50000 else 'Considera fortalecer tu patrimonio antes de inversiones significativas.'}
         """
     }
 
-def generate_pdf(usuario_data, finanzas_data, analisis_data):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
+# Generar plan de trabajo financiero con enfoque en bienes raíces
+def generar_plan_trabajo(ingresos, gastos, activos, pasivos):
+    if not st.session_state.get('openai_configured', False):
+        return "Servicio de IA no disponible en este momento. Por favor configura tu clave de OpenAI API en secrets.toml para habilitar esta función."
     
-    pdf.set_font("Arial", 'B', 16)
-    pdf.cell(200, 10, txt="Informe Financiero", ln=1, align='C')
-    pdf.cell(200, 10, txt="Taller de Bienes Raíces", ln=1, align='C')
-    pdf.ln(10)
+    prompt = f"""
+    Como experto en bienes raíces y finanzas personales (siguiendo la metodología de Carlos Devis), analiza esta situación financiera:
+    - Ingresos: {format_currency(ingresos)}/mes
+    - Gastos: {format_currency(gastos)}/mes
+    - Activos: {format_currency(activos)}
+    - Pasivos: {format_currency(pasivos)}
     
-    pdf.set_font("Arial", 'B', 12)
-    pdf.cell(200, 10, txt="Datos Personales:", ln=1)
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt=f"Nombre: {usuario_data.get('nombre', '')}", ln=1)
-    pdf.cell(200, 10, txt=f"Email: {usuario_data.get('email', '')}", ln=1)
-    pdf.ln(5)
+    Crea un plan detallado orientado específicamente a inversión en bienes raíces que incluya:
+    1. Diagnóstico claro de la situación actual con enfoque en bienes raíces
+    2. Estrategias para mejorar el flujo de caja aplicables a inversión inmobiliaria
+    3. Plan de reducción de deudas que permita acceder a financiamiento hipotecario
+    4. Recomendaciones de inversión en bienes raíces personalizadas según el perfil
+    5. Metas a corto (3 meses), mediano (1 año) y largo plazo (5+ años) para construir patrimonio inmobiliario
+    6. Ejercicios prácticos para identificar oportunidades locales
+    7. Recomendaciones específicas de cursos y recursos del Taller de Bienes Raíces
     
-    pdf.set_font("Arial", 'B', 12)
-    pdf.cell(200, 10, txt="Situación Financiera:", ln=1)
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt=f"Ingresos: {format_currency(finanzas_data.get('ingresos', 0))}/mes", ln=1)
-    pdf.cell(200, 10, txt=f"Gastos: {format_currency(finanzas_data.get('gastos', 0))}/mes", ln=1)
-    pdf.cell(200, 10, txt=f"Patrimonio: {format_currency(finanzas_data.get('activos', 0) - finanzas_data.get('pasivos', 0))}", ln=1)
-    pdf.ln(5)
+    Usa un lenguaje claro y motivador, con ejemplos concretos de estrategias inmobiliarias.
+    Incluye referencias a los principios enseñados por Carlos Devis en sus cursos.
+    Respuesta en español.
+    """
     
-    if 'perfil_inversion' in analisis_data:
-        pdf.set_font("Arial", 'B', 12)
-        pdf.cell(200, 10, txt=f"Perfil: {analisis_data['perfil_inversion']['nivel']}", ln=1)
-        pdf.set_font("Arial", size=12)
-        pdf.multi_cell(0, 10, txt=analisis_data['perfil_inversion']['descripcion'])
-    
-    pdf_output = BytesIO()
-    pdf.output(pdf_output)
-    pdf_bytes = pdf_output.getvalue()
-    pdf_output.close()
-    return pdf_bytes
+    try:
+        with st.spinner('Generando tu plan personalizado para bienes raíces...'):
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "Eres un asesor experto en inversión en bienes raíces que sigue la metodología de Carlos Devis. Responde en español con enfoque práctico para inversión inmobiliaria."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7
+            )
+        return response.choices[0].message.content
+    except Exception as e:
+        st.error(f"Error al generar el plan: {str(e)}")
+        return "No se pudo generar el plan en este momento."
 
-# Interfaz principal
+# Función para crear tooltip de ayuda
+def help_tooltip(text):
+    st.markdown(f"""
+    <span class="help-icon">?
+        <span class="help-text">{text}</span>
+    </span>
+    """, unsafe_allow_html=True)
+
+# Interfaz principal de Streamlit
 def main():
-    load_css()
-    show_header()
+    load_css()  # Cargar estilos CSS personalizados
     
+    # Encabezado con logo
     st.markdown("""
-    <div class="calculator-container">
-        Herramienta para analizar tu capacidad de inversión en bienes raíces 
-        y crear un plan de acción personalizado.
+    <div class="header-container">
+        <img src="https://raw.githubusercontent.com/tallerdebienesraices/calculadora/main/logo_tbr.png" class="logo" alt="Logo Taller Bienes Raíces">
+        <div>
+            <h1 style="margin:0;color:#1E3A8A;">Taller de Bienes Raíces</h1>
+            <h3 style="margin:0;color:#6B7280;">Calculadora Financiera para Inversión Inmobiliaria</h3>
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
-    if 'reporte_data' not in st.session_state:
-        st.session_state['reporte_data'] = {'usuario': {}, 'finanzas': {}, 'analisis': {}}
+    st.markdown("""
+    <div class="calculator-container">
+        Esta herramienta te ayudará a analizar tu capacidad para invertir en bienes raíces, 
+        crear un plan de acción y establecer metas claras para construir patrimonio inmobiliario.
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Sección 1: Información personal
-    with st.expander("📝 Información Personal", expanded=True):
-        st.markdown("**Nombre completo**")
-        st.markdown('<div class="field-description">Ingresa tu nombre completo como aparece en tus documentos</div>', unsafe_allow_html=True)
-        nombre = st.text_input("Nombre", label_visibility="collapsed")
-        
-        st.markdown("**Edad**")
-        st.markdown('<div class="field-description">Debes ser mayor de 18 años para usar esta herramienta</div>', unsafe_allow_html=True)
-        edad = st.number_input("Edad", min_value=18, max_value=100, value=30, label_visibility="collapsed")
-        
-        st.markdown("**Email**")
-        st.markdown('<div class="field-description">Ingresa un email válido para recibir tu reporte</div>', unsafe_allow_html=True)
-        email = st.text_input("Email", label_visibility="collapsed")
-        
-        st.markdown("**Teléfono**")
-        st.markdown('<div class="field-description">Número de contacto opcional</div>', unsafe_allow_html=True)
-        telefono = st.text_input("Teléfono", label_visibility="collapsed")
+    # Inicializar variables de sesión para el reporte
+    if 'reporte_data' not in st.session_state:
+        st.session_state['reporte_data'] = {
+            'usuario': {},
+            'finanzas': {},
+            'analisis': {}
+        }
+    
+    # Paso 1: Registro de usuario
+    with st.container():
+        st.subheader("📝 Información Personal")
+        nombre = st.text_input("Nombre completo")
+        edad = st.number_input("Edad", min_value=18, max_value=100, value=30)
+        email = st.text_input("Email")
+        telefono = st.text_input("Teléfono")
         
         if st.button("Guardar información personal"):
             if nombre and email:
                 usuario_id = registrar_usuario(nombre, edad, email, telefono)
                 st.session_state['usuario_id'] = usuario_id
                 st.session_state['reporte_data']['usuario'] = {
-                    'nombre': nombre, 'edad': edad, 'email': email, 'telefono': telefono
+                    'nombre': nombre,
+                    'edad': edad,
+                    'email': email,
+                    'telefono': telefono
                 }
                 st.success("Información guardada correctamente")
             else:
-                st.warning("Por favor completa los campos obligatorios (Nombre y Email)")
+                st.warning("Por favor completa todos los campos obligatorios")
     
-    # Sección 2: Activos y Pasivos
+    # Paso 2: Datos financieros - Activos y Pasivos
     if 'usuario_id' in st.session_state:
-        with st.expander("💰 Activos y Pasivos", expanded=True):
+        with st.container():
+            st.subheader("📊 Elaborar mi presupuesto")
             st.markdown("""
-            <h4 style="color: var(--azul-oscuro);">Activos</h4>
-            <p class="field-description">Ingresa el valor de mercado de tus activos y cualquier deuda asociada</p>
-            """, unsafe_allow_html=True)
+            **Ejercicio:** Comienza por hacer un presupuesto detallado de tu gasto diario y mensual. 
+            Revisa extractos de cuentas y tarjetas, y anota todo lo que gastas en efectivo. 
+            Identifica oportunidades para destinar recursos a inversión en bienes raíces.
+            """)
             
+            st.subheader("💰 Activos y Pasivos")
+            
+            # Lista de activos con descripciones claras
             activos_items = [
-                {"nombre": "Propiedad Principal", "desc": "Valor de mercado de tu vivienda principal"},
-                {"nombre": "Otras Propiedades", "desc": "Valor de otras propiedades que poseas"},
-                {"nombre": "Vehículos", "desc": "Valor actual de tus automóviles"},
-                {"nombre": "Inversiones Financieras", "desc": "Valor de cuentas de ahorro, acciones, fondos, etc."}
+                {"nombre": "Propiedad principal", "descripcion": "Valor de mercado de tu vivienda principal (casa o apartamento)"},
+                {"nombre": "Propiedades adicionales", "descripcion": "Valor de mercado de otras propiedades que poseas"},
+                {"nombre": "Vehículos", "descripcion": "Valor actual de tus vehículos (automóviles, motos, etc.)"},
+                {"nombre": "Muebles y enseres", "descripcion": "Valor estimado de muebles, electrodomésticos y artículos del hogar"},
+                {"nombre": "Joyas y artículos de valor", "descripcion": "Valor estimado de joyas, relojes, arte y colecciones"},
+                {"nombre": "Cuentas bancarias", "descripcion": "Saldo disponible en cuentas de ahorro y corrientes"},
+                {"nombre": "Inversiones financieras", "descripcion": "Valor de bonos, acciones, fondos de inversión y otros instrumentos"},
+                {"nombre": "Fondos de pensión", "descripcion": "Saldo acumulado en fondos de retiro o pensiones"},
+                {"nombre": "Préstamos por cobrar", "descripcion": "Dinero que has prestado a otras personas o empresas"},
+                {"nombre": "Negocios propios", "descripcion": "Valor estimado de negocios o emprendimientos que poseas"}
             ]
             
+            # Lista de pasivos con descripciones claras
+            pasivos_items = [
+                {"nombre": "Hipoteca vivienda", "descripcion": "Saldo pendiente de tu crédito hipotecario principal"},
+                {"nombre": "Hipoteca otras propiedades", "descripcion": "Saldo pendiente de créditos para otras propiedades"},
+                {"nombre": "Tarjetas de crédito", "descripcion": "Saldo total adeudado en todas tus tarjetas de crédito"},
+                {"nombre": "Préstamos personales", "descripcion": "Saldo pendiente de préstamos de consumo o personales"},
+                {"nombre": "Préstamos vehiculares", "descripcion": "Saldo pendiente de créditos para compra de vehículos"},
+                {"nombre": "Préstamos estudiantiles", "descripcion": "Saldo pendiente de créditos educativos"},
+                {"nombre": "Otras deudas", "descripcion": "Cualquier otra obligación financiera no clasificada"}
+            ]
+            
+            # Inicializar valores en session_state si no existen
             if 'activos_values' not in st.session_state:
                 st.session_state['activos_values'] = {item['nombre']: {"valor": 0.0, "deuda": 0.0} for item in activos_items}
             
-            activos_total = 0.0
-            for item in activos_items:
-                st.markdown(f"**{item['nombre']}**")
-                st.markdown(f'<div class="field-description">{item["desc"]}</div>', unsafe_allow_html=True)
-                
-                cols = st.columns(2)
-                with cols[0]:
-                    valor = st.text_input(
-                        f"Valor {item['nombre']}",
-                        value=format_currency(st.session_state['activos_values'][item['nombre']]['valor']),
-                        key=f"val_{item['nombre']}",
-                        label_visibility="collapsed"
-                    )
-                
-                with cols[1]:
-                    deuda = st.text_input(
-                        f"Deuda {item['nombre']}",
-                        value=format_currency(st.session_state['activos_values'][item['nombre']]['deuda']),
-                        key=f"deuda_{item['nombre']}",
-                        label_visibility="collapsed"
-                    )
-                
-                valor_num = parse_currency(valor)
-                deuda_num = parse_currency(deuda)
-                neto = valor_num - deuda_num
-                
-                st.session_state['activos_values'][item['nombre']] = {
-                    'valor': valor_num, 
-                    'deuda': deuda_num
-                }
-                activos_total += neto
+            if 'pasivos_values' not in st.session_state:
+                st.session_state['pasivos_values'] = {item['nombre']: {"valor": 0.0, "deuda": 0.0} for item in pasivos_items}
             
+            # Tabla de activos
+            st.markdown("<h4>Activos</h4>", unsafe_allow_html=True)
+            
+            # Encabezados de tabla
+            cols = st.columns([3, 1, 1, 1])
+            cols[0].markdown("<b>Descripción</b>", unsafe_allow_html=True)
+            cols[1].markdown("<b>Valor ($)</b>", unsafe_allow_html=True)
+            cols[2].markdown("<b>Deuda ($)</b>", unsafe_allow_html=True)
+            cols[3].markdown("<b>Activo Neto ($)</b>", unsafe_allow_html=True)
+            
+            activos_total = {"valor": 0.0, "deuda": 0.0, "neto": 0.0}
+            
+            for item in activos_items:
+                cols = st.columns([3, 1, 1, 1])
+                
+                # Descripción con tooltip
+                with cols[0]:
+                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['descripcion']}</span></span>", unsafe_allow_html=True)
+                
+                # Campos de valor y deuda
+                valor = cols[1].text_input(
+                    f"Valor {item['nombre']}",
+                    value=format_currency(st.session_state['activos_values'][item['nombre']]['valor']),
+                    key=f"activo_valor_{item['nombre']}",
+                    label_visibility="collapsed"
+                )
+                
+                deuda = cols[2].text_input(
+                    f"Deuda {item['nombre']}",
+                    value=format_currency(st.session_state['activos_values'][item['nombre']]['deuda']),
+                    key=f"activo_deuda_{item['nombre']}",
+                    label_visibility="collapsed"
+                )
+                
+                # Calcular activo neto
+                valor_parsed = parse_currency(valor)
+                deuda_parsed = parse_currency(deuda)
+                neto = valor_parsed - deuda_parsed
+                
+                # Mostrar activo neto
+                cols[3].markdown(f"<div style='padding: 0.5rem;'>{format_currency(neto)}</div>", unsafe_allow_html=True)
+                
+                # Actualizar session state y totales
+                st.session_state['activos_values'][item['nombre']] = {
+                    "valor": valor_parsed,
+                    "deuda": deuda_parsed
+                }
+                
+                activos_total["valor"] += valor_parsed
+                activos_total["deuda"] += deuda_parsed
+                activos_total["neto"] += neto
+            
+            # Tabla de pasivos
+            st.markdown("<h4>Pasivos</h4>", unsafe_allow_html=True)
+            
+            # Encabezados de tabla
+            cols = st.columns([3, 1, 1, 1])
+            cols[0].markdown("<b>Descripción</b>", unsafe_allow_html=True)
+            cols[1].markdown("<b>Valor ($)</b>", unsafe_allow_html=True)
+            cols[2].markdown("<b>Deuda ($)</b>", unsafe_allow_html=True)
+            cols[3].markdown("<b>Activo Neto ($)</b>", unsafe_allow_html=True)
+            
+            pasivos_total = {"valor": 0.0, "deuda": 0.0, "neto": 0.0}
+            
+            for item in pasivos_items:
+                cols = st.columns([3, 1, 1, 1])
+                
+                # Descripción con tooltip
+                with cols[0]:
+                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['descripcion']}</span></span>", unsafe_allow_html=True)
+                
+                # Campos de valor y deuda (para pasivos, valor es el monto total de la deuda)
+                valor = cols[1].text_input(
+                    f"Valor {item['nombre']}",
+                    value=format_currency(st.session_state['pasivos_values'][item['nombre']]['valor']),
+                    key=f"pasivo_valor_{item['nombre']}",
+                    label_visibility="collapsed"
+                )
+                
+                # Para pasivos, la "deuda" sería el saldo pendiente (podría ser igual al valor)
+                deuda = cols[2].text_input(
+                    f"Deuda {item['nombre']}",
+                    value=format_currency(st.session_state['pasivos_values'][item['nombre']]['deuda']),
+                    key=f"pasivo_deuda_{item['nombre']}",
+                    label_visibility="collapsed"
+                )
+                
+                # Calcular activo neto (para pasivos sería negativo)
+                valor_parsed = parse_currency(valor)
+                deuda_parsed = parse_currency(deuda)
+                neto = -(valor_parsed - deuda_parsed)  # Negativo porque son pasivos
+                
+                # Mostrar activo neto
+                cols[3].markdown(f"<div style='padding: 0.5rem;'>{format_currency(neto)}</div>", unsafe_allow_html=True)
+                
+                # Actualizar session state y totales
+                st.session_state['pasivos_values'][item['nombre']] = {
+                    "valor": valor_parsed,
+                    "deuda": deuda_parsed
+                }
+                
+                pasivos_total["valor"] += valor_parsed
+                pasivos_total["deuda"] += deuda_parsed
+                pasivos_total["neto"] += neto
+            
+            # Mostrar totales
             st.markdown(f"""
             <div class="calculator-container">
-                <h4>Resumen de Activos</h4>
-                <p><strong>Total Activos Netos:</strong> {format_currency(activos_total)}</p>
+                <h4>Totales</h4>
+                <table style="width:100%">
+                    <tr>
+                        <td><strong>Total Valor Activos:</strong></td>
+                        <td>{format_currency(activos_total['valor'])}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Deuda Activos:</strong></td>
+                        <td>{format_currency(activos_total['deuda'])}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Activos Netos:</strong></td>
+                        <td>{format_currency(activos_total['neto'])}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Pasivos:</strong></td>
+                        <td>{format_currency(pasivos_total['neto'])}</td>
+                    </tr>
+                    <tr style="font-weight:bold; background-color:#EFF6FF;">
+                        <td><strong>Patrimonio Neto:</strong></td>
+                        <td>{format_currency(activos_total['neto'] + pasivos_total['neto'])}</td>
+                    </tr>
+                </table>
             </div>
             """, unsafe_allow_html=True)
-    
-    # Sección 3: Flujo de caja
-    if 'usuario_id' in st.session_state:
-        with st.expander("💸 Flujo de Caja Mensual", expanded=True):
-            st.markdown("""
-            <h4 style="color: var(--azul-oscuro);">Ingresos y Gastos Mensuales</h4>
-            <p class="field-description">Ingresa tus ingresos y gastos mensuales promedio</p>
-            """, unsafe_allow_html=True)
             
+            # Flujo de caja mensual
+            st.subheader("💸 Flujo de Caja Mensual")
+            
+            with st.expander("ℹ️ ¿Qué es el flujo de caja?"):
+                st.markdown("""
+                El flujo de caja es la diferencia entre tus ingresos y gastos mensuales. 
+                Un flujo positivo significa que tienes dinero disponible para ahorrar o invertir, 
+                mientras que un flujo negativo indica que gastas más de lo que ganas.
+                
+                Para inversión en bienes raíces, un flujo de caja positivo es esencial, ya que:
+                - Te permite ahorrar para la cuota inicial de una propiedad
+                - Demuestra capacidad de pago para obtener financiamiento
+                - Puede usarse para cubrir gastos de propiedades en arriendo
+                """)
+            
+            # Inicializar valores en session_state si no existen
             if 'ingresos_values' not in st.session_state:
                 st.session_state['ingresos_values'] = {
-                    "Sueldo/Negocio": {"valor": 0.0, "desc": "Ingresos por salario o negocio principal"},
-                    "Otros Ingresos": {"valor": 0.0, "desc": "Ingresos adicionales como arriendos, inversiones, etc."}
+                    "Salario principal": {"valor": 0.0, "descripcion": "Ingresos por salario o honorarios de tu actividad principal"},
+                    "Ingresos secundarios": {"valor": 0.0, "descripcion": "Ingresos por trabajos ocasionales o actividades secundarias"},
+                    "Ingresos por alquileres": {"valor": 0.0, "descripcion": "Dinero recibido por alquiler de propiedades o habitaciones"},
+                    "Ingresos por inversiones": {"valor": 0.0, "descripcion": "Dividendos, intereses o ganancias de capital de inversiones"},
+                    "Otros ingresos": {"valor": 0.0, "descripcion": "Cualquier otro ingreso no clasificado"}
                 }
             
             if 'gastos_values' not in st.session_state:
                 st.session_state['gastos_values'] = {
-                    "Vivienda": {"valor": 0.0, "desc": "Hipoteca/arriendo, servicios, mantenimiento"},
-                    "Alimentación": {"valor": 0.0, "desc": "Supermercado, restaurantes, comida"},
-                    "Transporte": {"valor": 0.0, "desc": "Gasolina, transporte público, mantenimiento"},
-                    "Otros Gastos": {"valor": 0.0, "desc": "Entretenimiento, educación, salud, etc."}
+                    "Vivienda": {"valor": 0.0, "descripcion": "Hipoteca, arriendo, administración, impuestos y mantenimiento de vivienda"},
+                    "Alimentación": {"valor": 0.0, "descripcion": "Supermercado, restaurantes y gastos de comida en general"},
+                    "Transporte": {"valor": 0.0, "descripcion": "Gasolina, transporte público, mantenimiento vehicular, parqueaderos"},
+                    "Educación": {"valor": 0.0, "descripcion": "Colegiatura, universidad, cursos y materiales educativos"},
+                    "Salud": {"valor": 0.0, "descripcion": "Seguros médicos, medicinas, consultas, tratamientos"},
+                    "Entretenimiento": {"valor": 0.0, "descripcion": "Salidas, viajes, suscripciones (Netflix, etc.), hobbies"},
+                    "Servicios públicos": {"valor": 0.0, "descripcion": "Agua, luz, gas, internet, teléfono, TV por cable"},
+                    "Seguros": {"valor": 0.0, "descripcion": "Seguro de vida, vehicular, hogar, salud"},
+                    "Deudas": {"valor": 0.0, "descripcion": "Pagos de tarjetas de crédito, préstamos personales, etc."},
+                    "Ahorros e inversiones": {"valor": 0.0, "descripcion": "Dinero destinado a ahorros, fondos de emergencia o inversiones"},
+                    "Otros gastos": {"valor": 0.0, "descripcion": "Cualquier otro gasto no clasificado"}
                 }
             
-            st.markdown("<h5>Ingresos Mensuales</h5>", unsafe_allow_html=True)
+            # Ingresos
+            st.markdown("<h4>Ingresos Mensuales</h4>", unsafe_allow_html=True)
             ingresos_total = 0.0
+            
             for item, data in st.session_state['ingresos_values'].items():
-                st.markdown(f"**{item}**")
-                st.markdown(f'<div class="field-description">{data["desc"]}</div>', unsafe_allow_html=True)
-                valor = st.text_input(
-                    f"Ingreso {item}",
+                cols = st.columns([4, 1])
+                with cols[0]:
+                    st.markdown(f"{item} <span class='help-icon'>?<span class='help-text'>{data['descripcion']}</span></span>", unsafe_allow_html=True)
+                
+                value = cols[1].text_input(
+                    f"{item} ($)",
                     value=format_currency(data['valor']),
-                    key=f"ing_{item}",
+                    key=f"ingreso_{item}",
                     label_visibility="collapsed"
                 )
-                valor_num = parse_currency(valor)
-                st.session_state['ingresos_values'][item]['valor'] = valor_num
-                ingresos_total += valor_num
+                parsed_value = parse_currency(value)
+                st.session_state['ingresos_values'][item]['valor'] = parsed_value
+                ingresos_total += parsed_value
             
-            st.markdown("<h5>Gastos Mensuales</h5>", unsafe_allow_html=True)
+            # Gastos
+            st.markdown("<h4>Gastos Mensuales</h4>", unsafe_allow_html=True)
             gastos_total = 0.0
+            
             for item, data in st.session_state['gastos_values'].items():
-                st.markdown(f"**{item}**")
-                st.markdown(f'<div class="field-description">{data["desc"]}</div>', unsafe_allow_html=True)
-                valor = st.text_input(
-                    f"Gasto {item}",
+                cols = st.columns([4, 1])
+                with cols[0]:
+                    st.markdown(f"{item} <span class='help-icon'>?<span class='help-text'>{data['descripcion']}</span></span>", unsafe_allow_html=True)
+                
+                value = cols[1].text_input(
+                    f"{item} ($)",
                     value=format_currency(data['valor']),
                     key=f"gasto_{item}",
                     label_visibility="collapsed"
                 )
-                valor_num = parse_currency(valor)
-                st.session_state['gastos_values'][item]['valor'] = valor_num
-                gastos_total += valor_num
+                parsed_value = parse_currency(value)
+                st.session_state['gastos_values'][item]['valor'] = parsed_value
+                gastos_total += parsed_value
             
-            flujo_caja = ingresos_total - gastos_total
+            # Calcular saldo mensual
+            saldo_mensual = ingresos_total - gastos_total
+            
+            # Mostrar resumen de flujo de caja
             st.markdown(f"""
             <div class="calculator-container">
-                <h4>Resumen Mensual</h4>
-                <p><strong>Total Ingresos:</strong> {format_currency(ingresos_total)}</p>
-                <p><strong>Total Gastos:</strong> {format_currency(gastos_total)}</p>
-                <p><strong>Flujo de Caja:</strong> <span style="color: {'var(--verde)' if flujo_caja >=0 else 'var(--rojo)'}">
-                    {format_currency(flujo_caja)}
-                </span></p>
+                <h4>Resumen Flujo de Caja Mensual</h4>
+                <table style="width:100%">
+                    <tr>
+                        <td><strong>Total Ingresos:</strong></td>
+                        <td class="positive-value">{format_currency(ingresos_total)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Gastos:</strong></td>
+                        <td class="negative-value">{format_currency(gastos_total)}</td>
+                    </tr>
+                    <tr style="font-weight:bold; background-color:#EFF6FF;">
+                        <td><strong>Saldo Mensual:</strong></td>
+                        <td class="{ 'positive-value' if saldo_mensual >= 0 else 'negative-value' }">{format_currency(saldo_mensual)}</td>
+                    </tr>
+                </table>
+                
+                <p style="margin-top:10px;">
+                    {f"💡 Tienes {format_currency(saldo_mensual)} disponibles cada mes para ahorrar o invertir en bienes raíces." if saldo_mensual > 0 else 
+                      f"⚠️ Estás gastando {format_currency(abs(saldo_mensual))} más de lo que ganas cada mes. Considera ajustar tus gastos."}
+                </p>
             </div>
             """, unsafe_allow_html=True)
             
-            if st.button("Analizar mi situación financiera"):
-                pasivos_total = sum(item['deuda'] for item in st.session_state['activos_values'].values())
-                analisis = analizar_situacion_financiera(
-                    ingresos_total, 
-                    gastos_total, 
-                    activos_total, 
-                    pasivos_total
-                )
+            if st.button("Analizar mi situación financiera para bienes raíces"):
+                # Calcular total de activos netos (suma de activos netos + pasivos netos)
+                total_activos_netos = activos_total['neto'] + pasivos_total['neto']
                 
+                st.session_state['datos_financieros'] = (ingresos_total, gastos_total, total_activos_netos, abs(pasivos_total['neto']))
+                analisis = analizar_situacion_financiera(ingresos_total, gastos_total, total_activos_netos, abs(pasivos_total['neto']))
                 st.session_state['reporte_data']['finanzas'] = {
                     'ingresos': ingresos_total,
                     'gastos': gastos_total,
-                    'activos': activos_total,
-                    'pasivos': pasivos_total
+                    'activos': total_activos_netos,
+                    'pasivos': abs(pasivos_total['neto'])
                 }
-                st.session_state['reporte_data']['analisis'] = analisis
+                st.session_state['reporte_data']['analisis']['resumen'] = analisis['resumen']
+                st.session_state['reporte_data']['analisis']['perfil_inversion'] = analisis['perfil_inversion']
                 
-                st.subheader("📊 Resultados del Análisis")
-                st.markdown(analisis['resumen'])
+                # Generar y mostrar plan de trabajo específico para bienes raíces
+                plan = generar_plan_trabajo(ingresos_total, gastos_total, total_activos_netos, abs(pasivos_total['neto']))
+                st.subheader("📝 Plan de Trabajo para Inversión en Bienes Raíces")
+                st.write(plan)
+                st.session_state['reporte_data']['analisis']['plan_trabajo'] = plan
+                
+                # Recomendaciones de cursos según perfil
+                if analisis['perfil_inversion']['nivel'].startswith("Alto"):
+                    cursos = """
+                    Recomendaciones de Cursos:
+                    - Curso Avanzado de Estrategias Inmobiliarias
+                    - Taller de Financiamiento Creativo para Propiedades
+                    - Masterclass en Identificación de Oportunidades
+                    """
+                elif analisis['perfil_inversion']['nivel'].startswith("Medio"):
+                    cursos = """
+                    Recomendaciones de Cursos:
+                    - Curso Intermedio de Inversión en Bienes Raíces
+                    - Taller de Co-Inversiones y Sociedades
+                    - Seminario de Análisis de Mercado Local
+                    """
+                else:
+                    cursos = """
+                    Recomendaciones de Cursos:
+                    - Curso Básico de Educación Financiera
+                    - Taller de Presupuesto y Ahorro
+                    - Introducción a la Inversión en Bienes Raíces
+                    """
+                
+                st.session_state['reporte_data']['analisis']['recomendaciones_cursos'] = cursos
+                
+                # Mostrar recursos adicionales
+                st.subheader("🎓 Recursos Educativos Recomendados")
+                st.markdown("""
+                - [Canal de YouTube de Carlos Devis](https://www.youtube.com/@carlosdevis)
+                - [Ciclo Educativo Taller de Bienes Raíces](https://landing.tallerdebienesraices.com/registro-ciclo-educativo/)
+                - [Playlist: Estrategias Inmobiliarias](https://www.youtube.com/playlist?list=PL2qGhDf0PEjSF5zxLMa6SlVUxPd4273tl)
+                - [Playlist: Financiamiento Creativo](https://www.youtube.com/playlist?list=PL2qGhDf0PEjT9Jy7ULNGfFQvTsruUAyCe)
+                """)
     
-    # Generar PDF
+    # Paso 3: Plan de inversión en bienes raíces
+    if 'datos_financieros' in st.session_state:
+        with st.container():
+            st.subheader("📈 Plan de Inversión en Bienes Raíces")
+            
+            # Sección de tips como habladores
+            with st.expander("💡 ESTRATEGIAS PARA INVERTIR EN BIENES RAÍCES"):
+                st.markdown("""
+                <div class="tips-container">
+                    **1. Propiedades en Remate Bancario**  
+                    Los bancos suelen vender propiedades embargadas por debajo del valor de mercado. Requiere investigación pero puede ofrecer excelentes oportunidades.
+                    
+                    **2. Compra con Opción de Compra**  
+                    Negocia con el propietario el derecho a comprar la propiedad en el futuro a un precio acordado, mientras la alquilas.
+                    
+                    **3. Co-Inversiones**  
+                    Asóciate con otros inversionistas para adquirir propiedades que individualmente no podrías comprar.
+                    
+                    **4. Propiedades con Dueño Directo**  
+                    Muchas veces puedes encontrar mejores negocios tratando directamente con dueños que no usan agentes inmobiliarios.
+                    
+                    **5. Rehabilitación de Propiedades**  
+                    Compra propiedades que necesiten reparaciones, haz mejoras estratégicas y véndelas con ganancia o alquílalas por mayor valor.
+                    
+                    **6. Rentas por Habitación**  
+                    En lugar de alquilar una propiedad completa, alquila por habitaciones para maximizar el ingreso.
+                    
+                    **7. Propiedades Comerciales**  
+                    Locales comerciales pueden ofrecer mayores rentabilidades que propiedades residenciales.
+                    
+                    **8. Terrenos con Potencial**  
+                    Identifica terrenos en zonas con crecimiento futuro y adquiérelos antes de que suban de valor.
+                    
+                    **9. Propiedades con Múltiples Fuentes de Ingreso**  
+                    Busca propiedades que permitan generar ingresos adicionales (lavandería, parqueaderos, etc.).
+                    
+                    **10. Rentas Vacacionales**  
+                    Propiedades en zonas turísticas pueden generar ingresos significativos por rentas a corto plazo.
+                </div>
+                """, unsafe_allow_html=True)
+            
+            objetivos = st.text_input("Objetivos específicos con bienes raíces", 
+                                    "Generar ingresos pasivos a través de propiedades en alquiler")
+            horizonte = st.selectbox("Horizonte de inversión", 
+                                   ["Corto plazo (1-3 años)", "Mediano plazo (3-5 años)", "Largo plazo (5+ años)"])
+            estrategias = st.multiselect("Estrategias de interés", 
+                                       ["Alquiler residencial", "Alquiler comercial", "Rehabilitación y venta", 
+                                        "Terrenos", "Remates bancarios", "Rentas vacacionales", "Co-inversiones"])
+            
+            if st.button("Generar estrategia personalizada"):
+                st.session_state['plan_inversion'] = (objetivos, horizonte, ", ".join(estrategias))
+                ingresos, gastos, activos, pasivos = st.session_state['datos_financieros']
+                analisis_ia = generar_plan_trabajo(ingresos, gastos, activos, pasivos)
+                
+                st.subheader("🧠 Estrategia Personalizada con IA")
+                st.write(analisis_ia)
+                st.session_state['reporte_data']['analisis']['analisis_ia'] = analisis_ia
+    
+    # Paso 4: Plan de retiro con bienes raíces
+    if 'usuario_id' in st.session_state and 'datos_financieros' in st.session_state:
+        with st.container():
+            st.subheader("👴 Plan de Retiro con Bienes Raíces")
+            
+            col1, col2 = st.columns(2)
+            edad_actual = col1.number_input("Tu edad actual", min_value=18, max_value=100, value=30)
+            edad_retiro = col2.number_input("Edad de retiro deseada", min_value=edad_actual+1, max_value=100, value=65)
+            
+            ingresos_retiro = parse_currency(
+                st.text_input("Ingresos anuales esperados durante el retiro ($)", value="$40,000")
+            )
+            gastos_retiro = parse_currency(
+                st.text_input("Gastos anuales esperados durante el retiro ($)", value="$30,000")
+            )
+            ahorros_retiro = parse_currency(
+                st.text_input("Ahorros actuales para el retiro ($)", value="$10,000")
+            )
+            
+            if st.button("Calcular proyección de retiro con bienes raíces"):
+                ingresos, gastos, activos, pasivos = st.session_state['datos_financieros']
+                flujo_caja = ingresos - gastos
+                patrimonio_neto = activos - pasivos
+                
+                analisis = analizar_proyeccion_retiro(edad_actual, edad_retiro, ingresos_retiro, gastos_retiro, ahorros_retiro, patrimonio_neto, flujo_caja)
+                st.session_state['reporte_data']['analisis']['proyeccion_retiro'] = analisis
+                
+                st.subheader("📊 Proyección de Retiro con Bienes Raíces")
+                st.write(f"**Años hasta el retiro:** {analisis['años_ahorro']}")
+                st.write(f"**Necesidad total estimada:** {format_currency(analisis['necesidad_total'])}")
+                st.write(f"**Ahorros actuales:** {format_currency(ahorros_retiro)}")
+                st.write(f"**Necesitas ahorrar aproximadamente:** {format_currency(analisis['ahorro_necesario_anual'])} anuales")
+                
+                st.subheader("🏡 Estrategias con Bienes Raíces para tu Retiro")
+                st.write("1. **Propiedades generadoras de ingreso pasivo:** Adquiere propiedades en alquiler que cubran tus gastos de retiro")
+                st.write("2. **Apreciación de capital:** Invierte en zonas con potencial de crecimiento para vender con ganancia al retirarte")
+                st.write("3. **Fondos inmobiliarios (REITs):** Alternativa más líquida para exposición al mercado inmobiliario")
+                
+                st.subheader("🎓 Recursos Educativos para Preparar tu Retiro")
+                st.markdown("""
+                - [Curso: Bienes Raíces para el Retiro](https://www.tallerdebienesraices.com/cursos/retiro)
+                - [Seminario: Estrategias de Ingreso Pasivo](https://www.tallerdebienesraices.com/seminarios/ingreso-pasivo)
+                - [Guía: Planificación Financiera para el Retiro](https://www.tallerdebienesraices.com/guias/retiro)
+                """)
+    
+    # Botón para descargar PDF
     if 'reporte_data' in st.session_state and st.session_state['reporte_data']['usuario']:
-        if st.button("📄 Generar Reporte PDF"):
+        if st.button("📄 Descargar Reporte Completo en PDF"):
             pdf_bytes = generate_pdf(
                 st.session_state['reporte_data']['usuario'],
                 st.session_state['reporte_data']['finanzas'],
                 st.session_state['reporte_data']['analisis']
             )
             
-            st.success("Reporte generado correctamente")
+            st.success("Reporte generado con éxito!")
+            
+            # Crear enlace de descarga
             b64 = base64.b64encode(pdf_bytes).decode()
-            href = f'<a href="data:application/octet-stream;base64,{b64}" download="reporte_bienes_raices.pdf">Descargar Reporte Completo</a>'
+            href = f'<a href="data:application/octet-stream;base64,{b64}" download="reporte_bienes_raices.pdf">Haz clic aquí para descargar tu reporte</a>'
             st.markdown(href, unsafe_allow_html=True)
+    
+    # Pie de página
+    st.markdown("---")
+    st.markdown("""
+    <div class="calculator-container">
+        <h3>📌 Próximos Pasos</h3>
+        <ul>
+            <li>Revisa nuestro <a href="https://www.youtube.com/@carlosdevis" target="_blank">canal de YouTube</a> para más estrategias</li>
+            <li>Inscríbete en nuestro <a href="https://landing.tallerdebienesraices.com/registro-ciclo-educativo/" target="_blank">ciclo educativo</a></li>
+            <li>Asiste a nuestros eventos presenciales y online</li>
+            <li>Comienza con una propiedad pequeña y escala progresivamente</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     crear_base_datos()
