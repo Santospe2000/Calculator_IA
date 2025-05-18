@@ -513,7 +513,7 @@ def help_tooltip(text):
 def main():
     load_css()  # Cargar estilos CSS personalizados
     
-    # Encabezado con logo - AJUSTE SOLICITADO 2
+    # Encabezado con logo
     st.markdown("""
     <div class="header-container">
         <img src="https://raw.githubusercontent.com/tallerdebienesraices/calculadora/main/logo_tbr.png" class="logo" alt="Logo Taller Bienes Raíces">
@@ -573,31 +573,32 @@ def main():
             
             st.subheader("💰 Activos y Pasivos")
             
-            # Lista de activos y pasivos - ESTRUCTURA ORIGINAL RESTAURADA
+            # Lista de activos con descripciones mejoradas
             activos_items = [
-                {"nombre": "Inmueble 1", "descripcion": "Valor propiedad 1"},
-                {"nombre": "Inmueble 2", "descripcion": "Valor propiedad 2"},
-                {"nombre": "Automóvil 1", "descripcion": "Valor vehículo 1"},
-                {"nombre": "Automóvil 2", "descripcion": "Valor vehículo 2"},
-                {"nombre": "Muebles", "descripcion": "Valor muebles"},
-                {"nombre": "Joyas", "descripcion": "Valor joyas"},
-                {"nombre": "Arte", "descripcion": "Valor arte"},
-                {"nombre": "Efectivo cuenta 1", "descripcion": "Saldo cuenta 1"},
-                {"nombre": "Efectivo cuenta 2", "descripcion": "Saldo cuenta 2"},
-                {"nombre": "Deudas por cobrar", "descripcion": "Dinero a recibir"},
-                {"nombre": "Bonos o títulos valores", "descripcion": "Valor inversiones"},
-                {"nombre": "Fondo de retiro", "descripcion": "Saldo retiro"},
-                {"nombre": "Bonos o derechos laborales", "descripcion": "Valor laboral"}
+                {"nombre": "Inmueble 1", "descripcion": "Valor de mercado de tu propiedad principal o primera vivienda"},
+                {"nombre": "Inmueble 2", "descripcion": "Valor de mercado de tu segunda propiedad o inversión inmobiliaria"},
+                {"nombre": "Automóvil 1", "descripcion": "Valor actual de tu vehículo principal según el mercado"},
+                {"nombre": "Automóvil 2", "descripcion": "Valor actual de tu segundo vehículo si aplica"},
+                {"nombre": "Muebles", "descripcion": "Valor estimado de tus muebles y enseres domésticos"},
+                {"nombre": "Joyas", "descripcion": "Valor aproximado de tus joyas y artículos de valor"},
+                {"nombre": "Arte", "descripcion": "Valor de mercado de tus obras de arte o colecciones"},
+                {"nombre": "Efectivo cuenta 1", "descripcion": "Saldo disponible en tu cuenta bancaria principal"},
+                {"nombre": "Efectivo cuenta 2", "descripcion": "Saldo disponible en cuentas secundarias o de ahorros"},
+                {"nombre": "Deudas por cobrar", "descripcion": "Dinero que otras personas o entidades te deben"},
+                {"nombre": "Bonos o títulos valores", "descripcion": "Valor actual de tus inversiones financieras"},
+                {"nombre": "Fondo de retiro", "descripcion": "Saldo acumulado en tus fondos de pensión o retiro"},
+                {"nombre": "Bonos o derechos laborales", "descripcion": "Valor de prestaciones laborales por recibir"}
             ]
             
+            # Lista de pasivos con descripciones mejoradas
             pasivos_items = [
-                {"nombre": "Tarjeta de crédito 1", "descripcion": "Saldo principal"},
-                {"nombre": "Tarjeta de crédito 2", "descripcion": "Saldo secundarias"},
-                {"nombre": "Tarjeta de crédito 3", "descripcion": "Otras tarjetas"},
-                {"nombre": "Otra deuda 1", "descripcion": "Préstamos personales"},
-                {"nombre": "Otra deuda 2", "descripcion": "Préstamos estudios"},
-                {"nombre": "Otra deuda 3", "descripcion": "Otras deudas"},
-                {"nombre": "Otros", "descripcion": "Más deudas"}
+                {"nombre": "Tarjeta de crédito 1", "descripcion": "Saldo pendiente en tu tarjeta de crédito principal"},
+                {"nombre": "Tarjeta de crédito 2", "descripcion": "Saldo pendiente en tarjetas de crédito secundarias"},
+                {"nombre": "Tarjeta de crédito 3", "descripcion": "Saldo pendiente en otras tarjetas de crédito"},
+                {"nombre": "Otra deuda 1", "descripcion": "Préstamos personales o créditos de consumo pendientes"},
+                {"nombre": "Otra deuda 2", "descripcion": "Préstamos estudiantiles o educativos por pagar"},
+                {"nombre": "Otra deuda 3", "descripcion": "Otras obligaciones financieras no clasificadas"},
+                {"nombre": "Otros", "descripcion": "Cualquier otra deuda no incluida en las categorías anteriores"}
             ]
             
             # Inicializar valores en session_state si no existen
@@ -622,9 +623,9 @@ def main():
             for item in activos_items:
                 cols = st.columns([3, 1, 1, 1])
                 
-                # Descripción con tooltip - AJUSTE SOLICITADO 1 (DESCRIPCIONES SIN SIGNOS DE INTERROGACIÓN)
+                # Descripción con tooltip
                 with cols[0]:
-                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['descripcion'].replace('?', '.')}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['descripcion']}</span></span>", unsafe_allow_html=True)
                 
                 # Campos de valor y deuda
                 valor = cols[1].text_input(
@@ -674,7 +675,7 @@ def main():
             for item in pasivos_items:
                 cols = st.columns([3, 1, 1, 1])
                 
-                # Descripción con tooltip - AJUSTE SOLICITADO 1 (DESCRIPCIONES SIN SIGNOS DE INTERROGACIÓN)
+                # Descripción con tooltip
                 with cols[0]:
                     st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['descripcion']}</span></span>", unsafe_allow_html=True)
                 
@@ -741,7 +742,7 @@ def main():
             </div>
             """, unsafe_allow_html=True)
             
-            # Flujo de caja mensual - AJUSTE SOLICITADO 3
+            # Flujo de caja mensual
             st.subheader("💸 Flujo de Caja Mensual")
             
             with st.expander("ℹ️ ¿Qué es el flujo de caja?"):
@@ -819,7 +820,7 @@ def main():
             # Calcular saldo mensual
             saldo_mensual = ingresos_total - gastos_total
             
-            # Mostrar resumen de flujo de caja - AJUSTE SOLICITADO 4 (CORREGIDO)
+            # Mostrar resumen de flujo de caja
             st.markdown(f"""
             <div class="calculator-container">
                 <h4>Resumen Flujo de Caja</h4>
