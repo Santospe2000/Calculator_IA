@@ -513,7 +513,7 @@ def help_tooltip(text):
 def main():
     load_css()  # Cargar estilos CSS personalizados
     
-    # Encabezado con logo
+    # Encabezado con logo - AJUSTE SOLICITADO 2
     st.markdown("""
     <div class="header-container">
         <img src="https://raw.githubusercontent.com/tallerdebienesraices/calculadora/main/logo_tbr.png" class="logo" alt="Logo Taller Bienes Raíces">
@@ -573,29 +573,31 @@ def main():
             
             st.subheader("💰 Activos y Pasivos")
             
-            # Lista de activos con descripciones claras
+            # Lista de activos y pasivos con tooltips - AJUSTE SOLICITADO 1 (MANTENIENDO ESTRUCTURA ORIGINAL)
             activos_items = [
-                {"nombre": "Propiedad principal", "descripcion": "Valor de mercado de tu vivienda principal (casa o apartamento)"},
-                {"nombre": "Propiedades adicionales", "descripcion": "Valor de mercado de otras propiedades que poseas"},
-                {"nombre": "Vehículos", "descripcion": "Valor actual de tus vehículos (automóviles, motos, etc.)"},
-                {"nombre": "Muebles y enseres", "descripcion": "Valor estimado de muebles, electrodomésticos y artículos del hogar"},
-                {"nombre": "Joyas y artículos de valor", "descripcion": "Valor estimado de joyas, relojes, arte y colecciones"},
-                {"nombre": "Cuentas bancarias", "descripcion": "Saldo disponible en cuentas de ahorro y corrientes"},
-                {"nombre": "Inversiones financieras", "descripcion": "Valor de bonos, acciones, fondos de inversión y otros instrumentos"},
-                {"nombre": "Fondos de pensión", "descripcion": "Saldo acumulado en fondos de retiro o pensiones"},
-                {"nombre": "Préstamos por cobrar", "descripcion": "Dinero que has prestado a otras personas o empresas"},
-                {"nombre": "Negocios propios", "descripcion": "Valor estimado de negocios o emprendimientos que poseas"}
+                {"nombre": "Inmueble 1", "descripcion": "Valor de mercado de tu primera propiedad"},
+                {"nombre": "Inmueble 2", "descripcion": "Valor de mercado de tu segunda propiedad"},
+                {"nombre": "Automóvil 1", "descripcion": "Valor actual de tu vehículo principal"},
+                {"nombre": "Automóvil 2", "descripcion": "Valor actual de tu segundo vehículo"},
+                {"nombre": "Muebles", "descripcion": "Valor estimado de muebles y enseres"},
+                {"nombre": "Joyas", "descripcion": "Valor estimado de joyas y artículos de valor"},
+                {"nombre": "Arte", "descripcion": "Valor estimado de obras de arte y colecciones"},
+                {"nombre": "Efectivo cuenta 1", "descripcion": "Saldo disponible en tu cuenta principal"},
+                {"nombre": "Efectivo cuenta 2", "descripcion": "Saldo disponible en cuentas secundarias"},
+                {"nombre": "Deudas por cobrar", "descripcion": "Dinero que te deben otras personas o empresas"},
+                {"nombre": "Bonos o títulos valores", "descripcion": "Valor de tus inversiones financieras"},
+                {"nombre": "Fondo de retiro", "descripcion": "Saldo acumulado en fondos de pensiones"},
+                {"nombre": "Bonos o derechos laborales", "descripcion": "Valor de prestaciones laborales"}
             ]
             
-            # Lista de pasivos con descripciones claras
             pasivos_items = [
-                {"nombre": "Hipoteca vivienda", "descripcion": "Saldo pendiente de tu crédito hipotecario principal"},
-                {"nombre": "Hipoteca otras propiedades", "descripcion": "Saldo pendiente de créditos para otras propiedades"},
-                {"nombre": "Tarjetas de crédito", "descripcion": "Saldo total adeudado en todas tus tarjetas de crédito"},
-                {"nombre": "Préstamos personales", "descripcion": "Saldo pendiente de préstamos de consumo o personales"},
-                {"nombre": "Préstamos vehiculares", "descripcion": "Saldo pendiente de créditos para compra de vehículos"},
-                {"nombre": "Préstamos estudiantiles", "descripcion": "Saldo pendiente de créditos educativos"},
-                {"nombre": "Otras deudas", "descripcion": "Cualquier otra obligación financiera no clasificada"}
+                {"nombre": "Tarjeta de crédito 1", "descripcion": "Saldo pendiente en tu tarjeta principal"},
+                {"nombre": "Tarjeta de crédito 2", "descripcion": "Saldo pendiente en tarjetas secundarias"},
+                {"nombre": "Tarjeta de crédito 3", "descripcion": "Otras deudas con tarjetas de crédito"},
+                {"nombre": "Otra deuda 1", "descripcion": "Préstamos personales o de consumo"},
+                {"nombre": "Otra deuda 2", "descripcion": "Préstamos estudiantiles o educativos"},
+                {"nombre": "Otra deuda 3", "descripcion": "Otras obligaciones financieras"},
+                {"nombre": "Otros", "descripcion": "Cualquier otra deuda no clasificada"}
             ]
             
             # Inicializar valores en session_state si no existen
@@ -739,7 +741,7 @@ def main():
             </div>
             """, unsafe_allow_html=True)
             
-            # Flujo de caja mensual
+            # Flujo de caja mensual - AJUSTE SOLICITADO 3
             st.subheader("💸 Flujo de Caja Mensual")
             
             with st.expander("ℹ️ ¿Qué es el flujo de caja?"):
@@ -757,30 +759,27 @@ def main():
             # Inicializar valores en session_state si no existen
             if 'ingresos_values' not in st.session_state:
                 st.session_state['ingresos_values'] = {
-                    "Salario principal": {"valor": 0.0, "descripcion": "Ingresos por salario o honorarios de tu actividad principal"},
-                    "Ingresos secundarios": {"valor": 0.0, "descripcion": "Ingresos por trabajos ocasionales o actividades secundarias"},
-                    "Ingresos por alquileres": {"valor": 0.0, "descripcion": "Dinero recibido por alquiler de propiedades o habitaciones"},
-                    "Ingresos por inversiones": {"valor": 0.0, "descripcion": "Dividendos, intereses o ganancias de capital de inversiones"},
-                    "Otros ingresos": {"valor": 0.0, "descripcion": "Cualquier otro ingreso no clasificado"}
+                    "Ingresos mensuales adulto 1": {"valor": 0.0, "descripcion": "Salario, honorarios o ingresos principales del primer adulto en el hogar"},
+                    "Ingresos mensuales adulto 2": {"valor": 0.0, "descripcion": "Salario, honorarios o ingresos principales del segundo adulto en el hogar"},
+                    "Otros ingresos": {"valor": 0.0, "descripcion": "Ingresos adicionales como arriendos, inversiones, negocios secundarios"}
                 }
             
             if 'gastos_values' not in st.session_state:
                 st.session_state['gastos_values'] = {
-                    "Vivienda": {"valor": 0.0, "descripcion": "Hipoteca, arriendo, administración, impuestos y mantenimiento de vivienda"},
+                    "Gasto de Inmueble 1": {"valor": 0.0, "descripcion": "Hipoteca, administración, impuestos y mantenimiento de tu vivienda principal"},
+                    "Gasto de Inmueble 2": {"valor": 0.0, "descripcion": "Hipoteca, administración, impuestos y mantenimiento de tu segunda propiedad"},
                     "Alimentación": {"valor": 0.0, "descripcion": "Supermercado, restaurantes y gastos de comida en general"},
-                    "Transporte": {"valor": 0.0, "descripcion": "Gasolina, transporte público, mantenimiento vehicular, parqueaderos"},
                     "Educación": {"valor": 0.0, "descripcion": "Colegiatura, universidad, cursos y materiales educativos"},
-                    "Salud": {"valor": 0.0, "descripcion": "Seguros médicos, medicinas, consultas, tratamientos"},
-                    "Entretenimiento": {"valor": 0.0, "descripcion": "Salidas, viajes, suscripciones (Netflix, etc.), hobbies"},
-                    "Servicios públicos": {"valor": 0.0, "descripcion": "Agua, luz, gas, internet, teléfono, TV por cable"},
-                    "Seguros": {"valor": 0.0, "descripcion": "Seguro de vida, vehicular, hogar, salud"},
-                    "Deudas": {"valor": 0.0, "descripcion": "Pagos de tarjetas de crédito, préstamos personales, etc."},
-                    "Ahorros e inversiones": {"valor": 0.0, "descripcion": "Dinero destinado a ahorros, fondos de emergencia o inversiones"},
+                    "Transporte": {"valor": 0.0, "descripcion": "Gasolina, transporte público, mantenimiento vehicular"},
+                    "Salud": {"valor": 0.0, "descripcion": "Seguros médicos, medicinas, consultas"},
+                    "Entretenimiento": {"valor": 0.0, "descripcion": "Salidas, viajes, suscripciones (Netflix, etc.)"},
+                    "Servicios públicos": {"valor": 0.0, "descripcion": "Agua, luz, gas, internet, teléfono"},
+                    "Seguros": {"valor": 0.0, "descripcion": "Seguro de vida, vehicular, hogar"},
                     "Otros gastos": {"valor": 0.0, "descripcion": "Cualquier otro gasto no clasificado"}
                 }
             
             # Ingresos
-            st.markdown("<h4>Ingresos Mensuales</h4>", unsafe_allow_html=True)
+            st.markdown("<h4>Ingresos</h4>", unsafe_allow_html=True)
             ingresos_total = 0.0
             
             for item, data in st.session_state['ingresos_values'].items():
@@ -799,7 +798,7 @@ def main():
                 ingresos_total += parsed_value
             
             # Gastos
-            st.markdown("<h4>Gastos Mensuales</h4>", unsafe_allow_html=True)
+            st.markdown("<h4>Gastos</h4>", unsafe_allow_html=True)
             gastos_total = 0.0
             
             for item, data in st.session_state['gastos_values'].items():
@@ -820,10 +819,10 @@ def main():
             # Calcular saldo mensual
             saldo_mensual = ingresos_total - gastos_total
             
-            # Mostrar resumen de flujo de caja
+            # Mostrar resumen de flujo de caja - AJUSTE SOLICITADO 4 (CORREGIDO)
             st.markdown(f"""
             <div class="calculator-container">
-                <h4>Resumen Flujo de Caja Mensual</h4>
+                <h4>Resumen Flujo de Caja</h4>
                 <table style="width:100%">
                     <tr>
                         <td><strong>Total Ingresos:</strong></td>
