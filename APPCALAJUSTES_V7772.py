@@ -28,11 +28,11 @@ else:
     st.warning("Funcionalidad de IA limitada - No se configuró OPENAI_API_KEY")
     st.session_state['openai_configured'] = False
 
-# Función para tooltips
+# Función para tooltips mejorados
 def tooltip_icon(description):
     return f"""
     <span title="{description}" style="cursor: help; margin-left: 5px;">
-        <button style="border: none; background: #f0f2f6; border-radius: 50%; width: 20px; height: 20px; font-size: 12px;">i</button>
+        <button style="border: none; background: none; color: #1E3A8A; padding: 0; font-size: 14px;">ℹ️</button>
     </span>
     """
 
@@ -179,11 +179,17 @@ def load_css():
 
 # Función para formatear números como moneda
 def format_currency(value):
-    return f"$ {value:,.2f}" if value else "$               -   "
+    try:
+        if value is None or (isinstance(value, str) and value.strip() == "$ -":
+            return "$ -"
+        num = float(value)
+        return f"$ {num:,.2f}"
+    except:
+        return "$ -"
 
 # Función para extraer el valor numérico
 def parse_currency(currency_str):
-    if not currency_str or currency_str.strip() == "$               -   ":
+    if not currency_str or currency_str.strip() == "$ -":
         return 0.0
     num_str = re.sub(r'[^\d.]', '', currency_str)
     return float(num_str) if num_str else 0.0
@@ -374,16 +380,18 @@ def analizar_situacion_financiera(ingresos, gastos, activos, pasivos):
     with col1:
         st.metric("Ingresos Mensuales", format_currency(ingresos))
         st.metric("Gastos Mensuales", format_currency(gastos))
-        st.metric("Flujo de Caja Mensual", format_currency(flujo_caja_mensual), 
-                 delta="Positivo" if flujo_caja_mensual > 0 else "Negativo",
-                 delta_color="normal" if flujo_caja_mensual > 0 else "inverse")
     
     with col2:
         st.metric("Activos Totales", format_currency(activos))
         st.metric("Pasivos Totales", format_currency(pasivos))
-        st.metric("Patrimonio Neto", format_currency(patrimonio_neto), 
-                 delta="Positivo" if patrimonio_neto > 0 else "Negativo",
-                 delta_color="normal" if patrimonio_neto > 0 else "inverse")
+    
+    st.metric("Flujo de Caja Mensual", format_currency(flujo_caja_mensual), 
+             delta="Positivo" if flujo_caja_mensual > 0 else "Negativo",
+             delta_color="normal" if flujo_caja_mensual > 0 else "inverse")
+    
+    st.metric("Patrimonio Neto", format_currency(patrimonio_neto), 
+             delta="Positivo" if patrimonio_neto > 0 else "Negativo",
+             delta_color="normal" if patrimonio_neto > 0 else "inverse")
     
     st.subheader("🏡 Perfil de Inversión en Bienes Raíces")
     st.markdown(f"""
@@ -433,10 +441,6 @@ def analizar_situacion_financiera(ingresos, gastos, activos, pasivos):
         
         Perfil de Inversión en Bienes Raíces: {perfil}
         {descripcion}
-        
-        Análisis:
-        {'Tienes un flujo de caja positivo que podrías destinar a inversión en propiedades.' if flujo_caja_mensual > 0 else 'Necesitas equilibrar tu flujo de caja antes de considerar inversiones.'}
-        {'Tu patrimonio neto es sólido y podrías usarlo como garantía para financiamiento.' if patrimonio_neto > 50000 else 'Considera fortalecer tu patrimonio antes de inversiones significativas.'}
         """
     }
 
