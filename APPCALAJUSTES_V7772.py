@@ -28,6 +28,14 @@ else:
     st.warning("Funcionalidad de IA limitada - No se configuró OPENAI_API_KEY")
     st.session_state['openai_configured'] = False
 
+# Función para tooltips
+def tooltip_icon(description):
+    return f"""
+    <span title="{description}" style="cursor: help; margin-left: 5px;">
+        <button style="border: none; background: #f0f2f6; border-radius: 50%; width: 20px; height: 20px; font-size: 12px;">i</button>
+    </span>
+    """
+
 # Estilos CSS personalizados
 def load_css():
     st.markdown("""
@@ -153,12 +161,6 @@ def load_css():
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 0 8px 8px 0;
-        }
-        
-        .field-description {
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 4px;
         }
         
         @media (max-width: 768px) {
@@ -543,60 +545,21 @@ def main():
             
             st.subheader("💰 Activos y Pasivos")
             
-            # Definición de activos con descripciones completas
+            # Definición de activos con tooltips
             activos_items = [
-                {
-                    "nombre": "Inmueble 1", 
-                    "descripcion": "Valor de mercado actual de tu propiedad principal (casa, apartamento o terreno). Según Carlos Devis, este es tu activo más importante para construir patrimonio."
-                },
-                {
-                    "nombre": "Inmueble 2", 
-                    "descripcion": "Valor de mercado de tu segunda propiedad si aplica. Carlos Devis recomienda diversificar con múltiples propiedades para generar ingresos pasivos."
-                },
-                {
-                    "nombre": "Automóvil 1", 
-                    "descripcion": "Valor actual de tu vehículo principal. Recuerda que según la metodología de Carlos Devis, los vehículos normalmente son pasivos que deprecian."
-                },
-                {
-                    "nombre": "Automóvil 2", 
-                    "descripcion": "Valor actual de tu segundo vehículo si aplica. Considera si realmente necesitas múltiples vehículos según tu estrategia financiera."
-                },
-                {
-                    "nombre": "Muebles", 
-                    "descripcion": "Valor estimado de muebles y enseres. Estos activos normalmente pierden valor con el tiempo y no generan ingresos."
-                },
-                {
-                    "nombre": "Joyas", 
-                    "descripcion": "Valor estimado de joyas y artículos de valor. Pueden mantener o aumentar su valor, pero no generan flujo de caja."
-                },
-                {
-                    "nombre": "Arte", 
-                    "descripcion": "Valor estimado de obras de arte y colecciones. Activos que pueden apreciarse pero requieren conocimiento especializado."
-                },
-                {
-                    "nombre": "Efectivo cuenta 1", 
-                    "descripcion": "Saldo disponible en tu cuenta principal. Carlos Devis recomienda mantener un fondo de emergencia equivalente a 3-6 meses de gastos."
-                },
-                {
-                    "nombre": "Efectivo cuenta 2", 
-                    "descripcion": "Saldo disponible en cuentas secundarias. Considera invertir estos excedentes en activos generadores de ingresos."
-                },
-                {
-                    "nombre": "Deudas por cobrar", 
-                    "descripcion": "Dinero que te deben otras personas o empresas. Evalúa la probabilidad real de recuperación de estos recursos."
-                },
-                {
-                    "nombre": "Bonos o títulos valores", 
-                    "descripcion": "Valor de tus inversiones financieras. Diversifica entre diferentes tipos de activos según tu perfil de riesgo."
-                },
-                {
-                    "nombre": "Fondo de retiro", 
-                    "descripcion": "Saldo acumulado en fondos de pensiones. Considera complementar estos ahorros con inversiones en bienes raíces."
-                },
-                {
-                    "nombre": "Bonos o derechos laborales", 
-                    "descripcion": "Valor de prestaciones laborales. Estos activos pueden convertirse en efectivo al terminar la relación laboral."
-                }
+                {"nombre": "Inmueble 1", "descripcion": "Valor de mercado de tu primera propiedad (casa, apartamento o terreno)."},
+                {"nombre": "Inmueble 2", "descripcion": "Valor de mercado de tu segunda propiedad (si aplica)."},
+                {"nombre": "Automóvil 1", "descripcion": "Valor actual de tu vehículo principal."},
+                {"nombre": "Automóvil 2", "descripcion": "Valor actual de tu segundo vehículo (si aplica)."},
+                {"nombre": "Muebles", "descripcion": "Valor estimado de muebles y enseres."},
+                {"nombre": "Joyas", "descripcion": "Valor estimado de joyas y artículos de valor."},
+                {"nombre": "Arte", "descripcion": "Valor estimado de obras de arte y colecciones."},
+                {"nombre": "Efectivo cuenta 1", "descripcion": "Saldo disponible en tu cuenta principal."},
+                {"nombre": "Efectivo cuenta 2", "descripcion": "Saldo disponible en cuentas secundarias."},
+                {"nombre": "Deudas por cobrar", "descripcion": "Dinero que te deben otras personas o empresas."},
+                {"nombre": "Bonos o títulos valores", "descripcion": "Valor de tus inversiones financieras."},
+                {"nombre": "Fondo de retiro", "descripcion": "Saldo acumulado en fondos de pensiones."},
+                {"nombre": "Bonos o derechos laborales", "descripcion": "Valor de prestaciones laborales."}
             ]
             
             # Inicializar valores en session_state si no existen
@@ -624,8 +587,8 @@ def main():
                 st.markdown(f"""
                 <tr>
                     <td>
-                        <strong>{item['nombre']}</strong><br>
-                        <span class="field-description">{item['descripcion']}</span>
+                        {item['nombre']}
+                        {tooltip_icon(item['descripcion'])}
                     </td>
                     <td><input type="text" id="activo_valor_{item['nombre']}" value="{format_currency(st.session_state['activos_values'][item['nombre']]['valor'])}"></td>
                     <td><input type="text" id="activo_deuda_{item['nombre']}" value="{format_currency(st.session_state['activos_values'][item['nombre']]['deuda'])}"></td>
@@ -671,26 +634,11 @@ def main():
             st.markdown("<h4>Ingresos Mensuales</h4>", unsafe_allow_html=True)
             
             ingresos_items = [
-                {
-                    "nombre": "Salario o ingresos principales", 
-                    "descripcion": "Ingresos fijos por trabajo o negocio principal. Base de tu capacidad financiera según la metodología de Carlos Devis."
-                },
-                {
-                    "nombre": "Ingresos secundarios", 
-                    "descripcion": "Ingresos adicionales por trabajos ocasionales o negocios secundarios. Carlos Devis recomienda desarrollar múltiples fuentes de ingreso."
-                },
-                {
-                    "nombre": "Ingresos por inversiones", 
-                    "descripcion": "Dividendos, intereses o ganancias de capital. El objetivo es que estos ingresos pasivos superen tus gastos."
-                },
-                {
-                    "nombre": "Ingresos por alquileres", 
-                    "descripcion": "Dinero recibido por alquilar propiedades. Uno de los pilares de la estrategia de bienes raíces de Carlos Devis."
-                },
-                {
-                    "nombre": "Otros ingresos", 
-                    "descripcion": "Cualquier otro ingreso no clasificado. Incluye regalías, comisiones, etc."
-                }
+                {"nombre": "Salario o ingresos principales", "descripcion": "Ingresos fijos por trabajo o negocio principal."},
+                {"nombre": "Ingresos secundarios", "descripcion": "Ingresos adicionales por trabajos ocasionales o negocios secundarios."},
+                {"nombre": "Ingresos por inversiones", "descripcion": "Dividendos, intereses o ganancias de capital."},
+                {"nombre": "Ingresos por alquileres", "descripcion": "Dinero recibido por alquilar propiedades."},
+                {"nombre": "Otros ingresos", "descripcion": "Cualquier otro ingreso no clasificado."}
             ]
             
             if 'ingresos_values' not in st.session_state:
@@ -701,8 +649,8 @@ def main():
             for item in ingresos_items:
                 cols = st.columns([4, 1])
                 cols[0].markdown(f"""
-                    <strong>{item['nombre']}</strong><br>
-                    <span class="field-description">{item['descripcion']}</span>
+                    {item['nombre']}
+                    {tooltip_icon(item['descripcion'])}
                 """, unsafe_allow_html=True)
                 
                 value = cols[1].text_input(
@@ -720,50 +668,17 @@ def main():
             st.markdown("<h4>Gastos Mensuales</h4>", unsafe_allow_html=True)
             
             gastos_items = [
-                {
-                    "nombre": "Vivienda", 
-                    "descripcion": "Hipoteca, arriendo, administración, impuestos y mantenimiento. Carlos Devis recomienda no superar el 30% de tus ingresos."
-                },
-                {
-                    "nombre": "Alimentación", 
-                    "descripcion": "Supermercado, restaurantes y gastos de comida. Área donde muchas personas pueden optimizar sus gastos."
-                },
-                {
-                    "nombre": "Transporte", 
-                    "descripcion": "Gasolina, transporte público, mantenimiento vehicular. Considera opciones más económicas o compartidas."
-                },
-                {
-                    "nombre": "Servicios públicos", 
-                    "descripcion": "Agua, luz, gas, internet, teléfono. Evalúa planes más económicos y hábitos de consumo."
-                },
-                {
-                    "nombre": "Seguros", 
-                    "descripcion": "Seguro de vida, vehicular, hogar, salud. Necesarios pero puedes comparar opciones más económicas."
-                },
-                {
-                    "nombre": "Entretenimiento", 
-                    "descripcion": "Salidas, viajes, suscripciones (Netflix, etc.). Área donde puedes recortar temporalmente para aumentar tu capacidad de inversión."
-                },
-                {
-                    "nombre": "Educación", 
-                    "descripcion": "Colegiatura, universidad, cursos y materiales. Inversión en conocimiento es clave según Carlos Devis, pero evalúa su ROI."
-                },
-                {
-                    "nombre": "Salud", 
-                    "descripcion": "Medicinas, consultas médicas, tratamientos. No escatimes en salud pero busca opciones económicas cuando sea posible."
-                },
-                {
-                    "nombre": "Deudas", 
-                    "descripcion": "Pagos de tarjetas de crédito, préstamos. Carlos Devis recomienda priorizar el pago de deudas con altos intereses."
-                },
-                {
-                    "nombre": "Ahorros e inversiones", 
-                    "descripcion": "Dinero destinado a ahorros o inversiones. Debería ser al menos el 20% de tus ingresos según la metodología."
-                },
-                {
-                    "nombre": "Otros gastos", 
-                    "descripcion": "Cualquier otro gasto no clasificado. Revisa periódicamente estos gastos para identificar áreas de optimización."
-                }
+                {"nombre": "Vivienda", "descripcion": "Hipoteca, arriendo, administración, impuestos y mantenimiento."},
+                {"nombre": "Alimentación", "descripcion": "Supermercado, restaurantes y gastos de comida."},
+                {"nombre": "Transporte", "descripcion": "Gasolina, transporte público, mantenimiento vehicular."},
+                {"nombre": "Servicios públicos", "descripcion": "Agua, luz, gas, internet, teléfono."},
+                {"nombre": "Seguros", "descripcion": "Seguro de vida, vehicular, hogar, salud."},
+                {"nombre": "Entretenimiento", "descripcion": "Salidas, viajes, suscripciones (Netflix, etc.)."},
+                {"nombre": "Educación", "descripcion": "Colegiatura, universidad, cursos y materiales."},
+                {"nombre": "Salud", "descripcion": "Medicinas, consultas médicas, tratamientos."},
+                {"nombre": "Deudas", "descripcion": "Pagos de tarjetas de crédito, préstamos."},
+                {"nombre": "Ahorros e inversiones", "descripcion": "Dinero destinado a ahorros o inversiones."},
+                {"nombre": "Otros gastos", "descripcion": "Cualquier otro gasto no clasificado."}
             ]
             
             if 'gastos_values' not in st.session_state:
@@ -774,8 +689,8 @@ def main():
             for item in gastos_items:
                 cols = st.columns([4, 1])
                 cols[0].markdown(f"""
-                    <strong>{item['nombre']}</strong><br>
-                    <span class="field-description">{item['descripcion']}</span>
+                    {item['nombre']}
+                    {tooltip_icon(item['descripcion'])}
                 """, unsafe_allow_html=True)
                 
                 value = cols[1].text_input(
@@ -810,13 +725,13 @@ def main():
                         <td class="{ 'positive-value' if saldo_mensual >= 0 else 'negative-value' }">{format_currency(saldo_mensual)}</td>
                     </tr>
                 </table>
-                
-                <p style="margin-top:10px;">
-                    {f"💡 Tienes {format_currency(saldo_mensual)} disponibles cada mes para ahorrar o invertir en bienes raíces." if saldo_mensual > 0 else 
-                      f"⚠️ Estás gastando {format_currency(abs(saldo_mensual))} más de lo que ganas cada mes. Considera ajustar tus gastos."}
-                </p>
             </div>
             """, unsafe_allow_html=True)
+            
+            if saldo_mensual > 0:
+                st.success(f"Tienes {format_currency(saldo_mensual)} disponibles cada mes para ahorrar o invertir en bienes raíces.")
+            else:
+                st.error(f"Estás gastando {format_currency(abs(saldo_mensual))} más de lo que ganas cada mes. Considera ajustar tus gastos.")
             
             if st.button("Analizar mi situación financiera para bienes raíces"):
                 analisis = analizar_situacion_financiera(ingresos_total, gastos_total, activos_total['neto'], activos_total['deuda'])
