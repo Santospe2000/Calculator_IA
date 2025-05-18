@@ -575,30 +575,30 @@ def main():
             
             # Lista de activos con descripciones mejoradas
             activos_items = [
-                {"nombre": "Inmueble 1", "descripcion": "Valor de mercado de tu propiedad principal o primera vivienda"},
-                {"nombre": "Inmueble 2", "descripcion": "Valor de mercado de tu segunda propiedad o inversión inmobiliaria"},
-                {"nombre": "Automóvil 1", "descripcion": "Valor actual de tu vehículo principal según el mercado"},
-                {"nombre": "Automóvil 2", "descripcion": "Valor actual de tu segundo vehículo si aplica"},
-                {"nombre": "Muebles", "descripcion": "Valor estimado de tus muebles y enseres domésticos"},
-                {"nombre": "Joyas", "descripcion": "Valor aproximado de tus joyas y artículos de valor"},
-                {"nombre": "Arte", "descripcion": "Valor de mercado de tus obras de arte o colecciones"},
-                {"nombre": "Efectivo cuenta 1", "descripcion": "Saldo disponible en tu cuenta bancaria principal"},
-                {"nombre": "Efectivo cuenta 2", "descripcion": "Saldo disponible en cuentas secundarias o de ahorros"},
-                {"nombre": "Deudas por cobrar", "descripcion": "Dinero que otras personas o entidades te deben"},
-                {"nombre": "Bonos o títulos valores", "descripcion": "Valor actual de tus inversiones financieras"},
-                {"nombre": "Fondo de retiro", "descripcion": "Saldo acumulado en tus fondos de pensión o retiro"},
-                {"nombre": "Bonos o derechos laborales", "descripcion": "Valor de prestaciones laborales por recibir"}
+                {"nombre": "Inmueble 1", "descripcion": "Valor de mercado actual de tu vivienda principal o primera propiedad"},
+                {"nombre": "Inmueble 2", "descripcion": "Valor de mercado de tu segunda vivienda o propiedad de inversión"},
+                {"nombre": "Automóvil 1", "descripcion": "Valor actual de tu vehículo principal según precios de mercado"},
+                {"nombre": "Automóvil 2", "descripcion": "Valor actual de tu segundo vehículo si posees más de uno"},
+                {"nombre": "Muebles", "descripcion": "Valor estimado de tus muebles y electrodomésticos"},
+                {"nombre": "Joyas", "descripcion": "Valor aproximado de tus joyas, relojes y artículos de valor"},
+                {"nombre": "Arte", "descripcion": "Valor de mercado de tus obras de arte, antigüedades o colecciones"},
+                {"nombre": "Efectivo cuenta 1", "descripcion": "Saldo disponible en tu cuenta corriente o de ahorros principal"},
+                {"nombre": "Efectivo cuenta 2", "descripcion": "Saldo disponible en otras cuentas bancarias secundarias"},
+                {"nombre": "Deudas por cobrar", "descripcion": "Dinero que te deben personas o empresas (préstamos otorgados)"},
+                {"nombre": "Bonos o títulos valores", "descripcion": "Valor actual de tus inversiones en bonos o instrumentos financieros"},
+                {"nombre": "Fondo de retiro", "descripcion": "Saldo acumulado en tus fondos de pensiones o planes de retiro"},
+                {"nombre": "Bonos o derechos laborales", "descripcion": "Valor de prestaciones sociales o beneficios laborales por recibir"}
             ]
             
             # Lista de pasivos con descripciones mejoradas
             pasivos_items = [
-                {"nombre": "Tarjeta de crédito 1", "descripcion": "Saldo pendiente en tu tarjeta de crédito principal"},
-                {"nombre": "Tarjeta de crédito 2", "descripcion": "Saldo pendiente en tarjetas de crédito secundarias"},
-                {"nombre": "Tarjeta de crédito 3", "descripcion": "Saldo pendiente en otras tarjetas de crédito"},
-                {"nombre": "Otra deuda 1", "descripcion": "Préstamos personales o créditos de consumo pendientes"},
-                {"nombre": "Otra deuda 2", "descripcion": "Préstamos estudiantiles o educativos por pagar"},
-                {"nombre": "Otra deuda 3", "descripcion": "Otras obligaciones financieras no clasificadas"},
-                {"nombre": "Otros", "descripcion": "Cualquier otra deuda no incluida en las categorías anteriores"}
+                {"nombre": "Tarjeta de crédito 1", "descripcion": "Saldo total adeudado en tu tarjeta de crédito principal"},
+                {"nombre": "Tarjeta de crédito 2", "descripcion": "Saldo pendiente en tus tarjetas de crédito adicionales"},
+                {"nombre": "Tarjeta de crédito 3", "descripcion": "Saldo en otras tarjetas de crédito que poseas"},
+                {"nombre": "Otra deuda 1", "descripcion": "Préstamos personales o créditos de consumo pendientes de pago"},
+                {"nombre": "Otra deuda 2", "descripcion": "Préstamos estudiantiles o financiamiento educativo por pagar"},
+                {"nombre": "Otra deuda 3", "descripcion": "Otras obligaciones financieras no incluidas en las categorías anteriores"},
+                {"nombre": "Otros", "descripcion": "Cualquier otra deuda o compromiso financiero no clasificado"}
             ]
             
             # Inicializar valores en session_state si no existen
