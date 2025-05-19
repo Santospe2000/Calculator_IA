@@ -148,11 +148,25 @@ def load_css():
             padding: 5px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            text-align: right;
+            font-family: monospace;
         }
         
         .data-table .total-row {
             background-color: #EFF6FF;
             font-weight: bold;
+        }
+        
+        .data-table td:last-child {
+            text-align: right;
+            font-family: monospace;
+            padding-right: 15px;
+        }
+        
+        .data-table td:first-child {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         
         .tips-container {
@@ -180,16 +194,16 @@ def load_css():
 # Función para formatear números como moneda
 def format_currency(value):
     try:
-        if value is None or (isinstance(value, str) and value.strip() == "$ -":
+        if value is None or value == 0:
             return "$ -"
-        num = float(value)
-        return f"$ {num:,.2f}"
+        value = float(value)
+        return f"$ {value:,.2f}" if value != 0 else "$ -"
     except:
         return "$ -"
 
 # Función para extraer el valor numérico
 def parse_currency(currency_str):
-    if not currency_str or currency_str.strip() == "$ -":
+    if not currency_str or currency_str.strip() in ["$ -", "$"]:
         return 0.0
     num_str = re.sub(r'[^\d.]', '', currency_str)
     return float(num_str) if num_str else 0.0
@@ -485,6 +499,88 @@ def generar_plan_trabajo(ingresos, gastos, activos, pasivos):
         st.error(f"Error al generar el plan: {str(e)}")
         return "No se pudo generar el plan en este momento."
 
+# Mostrar tabla de activos corregida
+def mostrar_tabla_activos():
+    activos_items = [
+        {"nombre": "Inmueble 1", "descripcion": "Valor de mercado de tu primera propiedad (casa, apartamento o terreno)."},
+        {"nombre": "Inmueble 2", "descripcion": "Valor de mercado de tu segunda propiedad (si aplica)."},
+        {"nombre": "Automóvil 1", "descripcion": "Valor actual de tu vehículo principal."},
+        {"nombre": "Automóvil 2", "descripcion": "Valor actual de tu segundo vehículo (si aplica)."},
+        {"nombre": "Muebles", "descripcion": "Valor estimado de muebles y enseres."},
+        {"nombre": "Joyas", "descripcion": "Valor estimado de joyas y artículos de valor."},
+        {"nombre": "Arte", "descripcion": "Valor estimado de obras de arte y colecciones."},
+        {"nombre": "Efectivo cuenta 1", "descripcion": "Saldo disponible en tu cuenta principal."},
+        {"nombre": "Efectivo cuenta 2", "descripcion": "Saldo disponible en cuentas secundarias."},
+        {"nombre": "Deudas por cobrar", "descripcion": "Dinero que te deben otras personas o empresas."},
+        {"nombre": "Bonos o títulos valores", "descripcion": "Valor de tus inversiones financieras."},
+        {"nombre": "Fondo de retiro", "descripcion": "Saldo acumulado en fondos de pensiones."},
+        {"nombre": "Bonos o derechos laborales", "descripcion": "Valor de prestaciones laborales."}
+    ]
+    
+    if 'activos_values' not in st.session_state:
+        st.session_state['activos_values'] = {item['nombre']: {"valor": 0.0, "deuda": 0.0} for item in activos_items}
+    
+    # Crear tabla de activos
+    st.markdown("""
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Descripción</th>
+                <th>Valor</th>
+                <th>Deuda</th>
+                <th>Activos Netos</th>
+            </tr>
+        </thead>
+        <tbody>
+    """, unsafe_allow_html=True)
+    
+    activos_total = {"valor": 0.0, "deuda": 0.0, "neto": 0.0}
+    
+    for item in activos_items:
+        # Fila de la tabla corregida
+        st.markdown(f"""
+        <tr>
+            <td>
+                {item['nombre']}
+                {tooltip_icon(item['descripcion'])}
+            </td>
+            <td><input type="text" id="activo_valor_{item['nombre'].replace(' ', '_')}" 
+                value="{format_currency(st.session_state['activos_values'][item['nombre']]['valor'])}"
+                onchange="updateActivosTotals()"></td>
+            <td><input type="text" id="activo_deuda_{item['nombre'].replace(' ', '_')}" 
+                value="{format_currency(st.session_state['activos_values'][item['nombre']]['deuda'])}"
+                onchange="updateActivosTotals()"></td>
+            <td>{format_currency(st.session_state['activos_values'][item['nombre']]['valor'] - st.session_state['activos_values'][item['nombre']]['deuda'])}</td>
+        </tr>
+        """, unsafe_allow_html=True)
+        
+        # Actualizar totales
+        activos_total["valor"] += st.session_state['activos_values'][item['nombre']]['valor']
+        activos_total["deuda"] += st.session_state['activos_values'][item['nombre']]['deuda']
+        activos_total["neto"] += (st.session_state['activos_values'][item['nombre']]['valor'] - st.session_state['activos_values'][item['nombre']]['deuda'])
+    
+    # Fila de totales
+    st.markdown(f"""
+    <tr class="total-row">
+        <td><strong>Total</strong></td>
+        <td><strong>{format_currency(activos_total['valor'])}</strong></td>
+        <td><strong>{format_currency(activos_total['deuda'])}</strong></td>
+        <td><strong>{format_currency(activos_total['neto'])}</strong></td>
+    </tr>
+    </tbody>
+    </table>
+    
+    <script>
+    function updateActivosTotals() {{
+        // Lógica para actualizar los totales cuando cambian los valores
+        console.log("Actualizando totales...");
+        // Aquí iría la lógica para recalcular los totales
+    }}
+    </script>
+    """, unsafe_allow_html=True)
+    
+    return activos_total
+
 # Interfaz principal de Streamlit
 def main():
     load_css()  # Cargar estilos CSS personalizados
@@ -548,74 +644,7 @@ def main():
             """)
             
             st.subheader("💰 Activos y Pasivos")
-            
-            # Definición de activos con tooltips
-            activos_items = [
-                {"nombre": "Inmueble 1", "descripcion": "Valor de mercado de tu primera propiedad (casa, apartamento o terreno)."},
-                {"nombre": "Inmueble 2", "descripcion": "Valor de mercado de tu segunda propiedad (si aplica)."},
-                {"nombre": "Automóvil 1", "descripcion": "Valor actual de tu vehículo principal."},
-                {"nombre": "Automóvil 2", "descripcion": "Valor actual de tu segundo vehículo (si aplica)."},
-                {"nombre": "Muebles", "descripcion": "Valor estimado de muebles y enseres."},
-                {"nombre": "Joyas", "descripcion": "Valor estimado de joyas y artículos de valor."},
-                {"nombre": "Arte", "descripcion": "Valor estimado de obras de arte y colecciones."},
-                {"nombre": "Efectivo cuenta 1", "descripcion": "Saldo disponible en tu cuenta principal."},
-                {"nombre": "Efectivo cuenta 2", "descripcion": "Saldo disponible en cuentas secundarias."},
-                {"nombre": "Deudas por cobrar", "descripcion": "Dinero que te deben otras personas o empresas."},
-                {"nombre": "Bonos o títulos valores", "descripcion": "Valor de tus inversiones financieras."},
-                {"nombre": "Fondo de retiro", "descripcion": "Saldo acumulado en fondos de pensiones."},
-                {"nombre": "Bonos o derechos laborales", "descripcion": "Valor de prestaciones laborales."}
-            ]
-            
-            # Inicializar valores en session_state si no existen
-            if 'activos_values' not in st.session_state:
-                st.session_state['activos_values'] = {item['nombre']: {"valor": 0.0, "deuda": 0.0} for item in activos_items}
-            
-            # Crear tabla de activos
-            st.markdown("""
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Descripción</th>
-                        <th>Valor</th>
-                        <th>Deuda</th>
-                        <th>Activos</th>
-                    </tr>
-                </thead>
-                <tbody>
-            """, unsafe_allow_html=True)
-            
-            activos_total = {"valor": 0.0, "deuda": 0.0, "neto": 0.0}
-            
-            for item in activos_items:
-                # Fila de la tabla
-                st.markdown(f"""
-                <tr>
-                    <td>
-                        {item['nombre']}
-                        {tooltip_icon(item['descripcion'])}
-                    </td>
-                    <td><input type="text" id="activo_valor_{item['nombre']}" value="{format_currency(st.session_state['activos_values'][item['nombre']]['valor'])}"></td>
-                    <td><input type="text" id="activo_deuda_{item['nombre']}" value="{format_currency(st.session_state['activos_values'][item['nombre']]['deuda'])}"></td>
-                    <td>{format_currency(st.session_state['activos_values'][item['nombre']]['valor'] - st.session_state['activos_values'][item['nombre']]['deuda'])}</td>
-                </tr>
-                """, unsafe_allow_html=True)
-                
-                # Actualizar totales
-                activos_total["valor"] += st.session_state['activos_values'][item['nombre']]['valor']
-                activos_total["deuda"] += st.session_state['activos_values'][item['nombre']]['deuda']
-                activos_total["neto"] += (st.session_state['activos_values'][item['nombre']]['valor'] - st.session_state['activos_values'][item['nombre']]['deuda'])
-            
-            # Fila de totales
-            st.markdown(f"""
-            <tr class="total-row">
-                <td><strong>Total</strong></td>
-                <td><strong>{format_currency(activos_total['valor'])}</strong></td>
-                <td><strong>{format_currency(activos_total['deuda'])}</strong></td>
-                <td><strong>{format_currency(activos_total['neto'])}</strong></td>
-            </tr>
-            </tbody>
-            </table>
-            """, unsafe_allow_html=True)
+            activos_total = mostrar_tabla_activos()
             
             # Flujo de caja mensual
             st.subheader("💸 Flujo de Caja Mensual")
