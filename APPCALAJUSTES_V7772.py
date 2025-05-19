@@ -30,144 +30,146 @@ else:
 
 # Estilos CSS personalizados para el formato de calculadora financiera
 def load_css():
-    st.markdown("""
+    st.markdown(f"""
     <style>
-        :root {
+        :root {{
             --azul-oscuro: #1E3A8A;
             --gris: #6B7280;
             --blanco: #FFFFFF;
             --verde: #10B981;
             --rojo: #EF4444;
-        }
+        }}
         
-        .stApp {
+        .stApp {{
             max-width: 900px;
             margin: auto;
             font-family: 'Arial', sans-serif;
             background-color: #F9FAFB;
-        }
+        }}
         
-        .header-container {
+        .header-container {{
             display: flex;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-        }
+        }}
         
-        .logo {
-            height: 60px;
-            margin-right: 20px;
-        }
+        .logo {{
+            height: 80px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }}
         
-        .calculator-container {
+        .calculator-container {{
             background-color: white;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
-        }
+            border: 1px solid #E5E7EB;
+        }}
         
-        .stButton>button {
+        .stButton>button {{
             background-color: var(--azul-oscuro);
             color: white;
             border-radius: 8px;
             padding: 10px 24px;
             font-weight: bold;
             width: 100%;
-        }
+            transition: all 0.3s ease;
+        }}
         
-        .stButton>button:hover {
+        .stButton>button:hover {{
             background-color: #1E40AF;
-            color: white;
-        }
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(30, 58, 138, 0.2);
+        }}
         
         .stTextInput>div>div>input, 
         .stNumberInput>div>div>input,
         .stSelectbox>div>div>select,
-        .stMultiselect>div>div>div {
+        .stMultiselect>div>div>div {{
             border-radius: 8px;
             border: 1px solid var(--gris);
-        }
+            padding: 10px;
+        }}
         
-        .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
+        .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {{
             color: var(--azul-oscuro);
-        }
+        }}
         
-        .stMetric {
+        .stMetric {{
             border-left: 4px solid var(--azul-oscuro);
             padding-left: 12px;
             background-color: white;
             border-radius: 8px;
             padding: 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
+        }}
         
-        .positive-value {
+        .positive-value {{
             color: var(--verde);
             font-weight: bold;
-        }
+        }}
         
-        .negative-value {
+        .negative-value {{
             color: var(--rojo);
             font-weight: bold;
-        }
+        }}
         
-        .data-table {
+        .data-table {{
             width: 100%;
             margin-bottom: 20px;
             border-collapse: collapse;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
+        }}
         
-        .data-table th {
+        .data-table th {{
             background-color: var(--azul-oscuro);
             color: white;
             padding: 10px;
             text-align: left;
-        }
+        }}
         
-        .data-table td {
+        .data-table td {{
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
-        }
+        }}
         
-        .data-table tr:nth-child(even) {
+        .data-table tr:nth-child(even) {{
             background-color: #f9f9f9;
-        }
+        }}
         
-        .data-table input {
+        .data-table input {{
             width: 100%;
             padding: 5px;
             border: 1px solid #ddd;
             border-radius: 4px;
-        }
+        }}
         
-        .data-table .total-row {
+        .data-table .total-row {{
             background-color: #EFF6FF;
             font-weight: bold;
-        }
+        }}
         
-        .tips-container {
+        .tips-container {{
             background-color: #f8f9fa;
             border-left: 4px solid var(--azul-oscuro);
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 0 8px 8px 0;
-        }
+        }}
         
-        .help-icon {
+        .help-icon {{
             color: var(--azul-oscuro);
             cursor: pointer;
             margin-left: 5px;
-            visibility: hidden;
-            width: 0;
-        }
+            position: relative;
+            display: inline-block;
+        }}
         
-        .help-icon:before {
-            content: "";
-        }
-        
-        .help-text {
+        .help-text {{
             display: none;
             position: absolute;
             background-color: white;
@@ -177,33 +179,62 @@ def load_css():
             z-index: 100;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             width: 300px;
-        }
+            left: 20px;
+            top: 0;
+        }}
         
-        .help-icon:hover + .help-text {
+        .help-icon:hover .help-text {{
             display: block;
-        }
+        }}
         
-        .help-icon:hover {
-            color: var(--azul-oscuro);
-            text-decoration: underline;
-        }
+        .emoji-help {{
+            font-size: 1.2em;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+        }}
         
-        @media (max-width: 768px) {
-            .header-container {
+        .emoji-help .help-text {{
+            width: 250px;
+            font-size: 0.9em;
+        }}
+        
+        .result-box {{
+            background-color: #F0F9FF;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid var(--azul-oscuro);
+        }}
+        
+        .course-recommendation {{
+            background-color: #F0FDF4;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid var(--verde);
+        }}
+        
+        .course-recommendation h4 {{
+            color: var(--verde);
+            margin-top: 0;
+        }}
+        
+        @media (max-width: 768px) {{
+            .header-container {{
                 flex-direction: column;
                 text-align: center;
-            }
+            }}
             
-            .logo {
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
+            .logo {{
+                margin-bottom: 15px;
+            }}
             
-            .help-text {
+            .help-text {{
                 width: 200px;
                 font-size: 12px;
-            }
-        }
+            }}
+        }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -388,16 +419,64 @@ def analizar_situacion_financiera(ingresos, gastos, activos, pasivos):
     flujo_caja_mensual = ingresos - gastos
     patrimonio_neto = activos - pasivos
     
-    # Determinar perfil de inversión en bienes raíces
+    # Determinar perfil de inversión en bienes raíces con recomendaciones específicas
     if patrimonio_neto > 50000 and flujo_caja_mensual > 1000:
         perfil = "Alto (70-100%)"
         descripcion = "Excelente perfil para inversión en bienes raíces. Tienes la capacidad financiera para comenzar a invertir en propiedades generadoras de ingresos pasivos."
+        
+        # Recomendaciones para perfil alto
+        recomendaciones_cursos = f"""
+        <div class="course-recommendation">
+            <h4>🚀 Recomendación para tu Perfil Alto</h4>
+            <p>Con tu perfil de inversión, te recomendamos nuestra <strong>Mentoría Avanzada en Tiendas Online</strong>:</p>
+            <p><a href="https://landing.carlosdevis.com/mentoria-tienda-online" target="_blank">https://landing.carlosdevis.com/mentoria-tienda-online</a></p>
+            
+            <h5>🔑 3 Tips importantes que encontrarás en el curso:</h5>
+            <ol>
+                <li><strong>Estrategias avanzadas de escalamiento:</strong> Aprenderás a multiplicar tus ingresos con técnicas probadas en el mercado digital.</li>
+                <li><strong>Automatización de procesos:</strong> Sistemas para que tu negocio funcione sin requerir tu tiempo constante.</li>
+                <li><strong>Fuentes alternativas de ingreso:</strong> Cómo diversificar tus flujos de efectivo en el ecosistema digital.</li>
+            </ol>
+        </div>
+        """
     elif patrimonio_neto > 20000 and flujo_caja_mensual > 500:
         perfil = "Medio (40-69%)"
         descripcion = "Buen potencial para inversión en bienes raíces. Considera comenzar con propiedades pequeñas o co-inversiones mientras mejoras tu flujo de caja."
+        
+        # Recomendaciones para perfil medio
+        recomendaciones_cursos = f"""
+        <div class="course-recommendation">
+            <h4>📈 Recomendación para tu Perfil Medio</h4>
+            <p>Para fortalecer tus habilidades, te recomendamos nuestro <strong>Programa Avanzado en Tiendas Online</strong>:</p>
+            <p><a href="https://landing.carlosdevis.com/cv-avanzado-tienda-online" target="_blank">https://landing.carlosdevis.com/cv-avanzado-tienda-online</a></p>
+            
+            <h5>🔑 3 Tips importantes que encontrarás en el curso:</h5>
+            <ol>
+                <li><strong>Modelos de negocio probados:</strong> Descubrirás las estructuras más efectivas para tiendas online rentables.</li>
+                <li><strong>Tácticas de conversión:</strong> Cómo optimizar cada visita a tu tienda para maximizar ventas.</li>
+                <li><strong>Fuentes de tráfico escalables:</strong> Estrategias para atraer clientes de manera consistente y predecible.</li>
+            </ol>
+        </div>
+        """
     else:
         perfil = "Bajo (0-39%)"
         descripcion = "Necesitas fortalecer tu situación financiera antes de invertir en bienes raíces. Enfócate en aumentar ingresos, reducir deudas y ahorrar."
+        
+        # Recomendaciones para perfil bajo
+        recomendaciones_cursos = f"""
+        <div class="course-recommendation">
+            <h4>📚 Recomendación para tu Perfil Bajo</h4>
+            <p>Para comenzar tu camino, te recomendamos nuestro <strong>Programa Avanzado en Tiendas Online</strong>:</p>
+            <p><a href="https://landing.carlosdevis.com/cv-avanzado-tienda-online" target="_blank">https://landing.carlosdevis.com/cv-avanzado-tienda-online</a></p>
+            
+            <h5>🔑 3 Tips importantes que encontrarás en el curso:</h5>
+            <ol>
+                <li><strong>Fundamentos sólidos:</strong> Aprenderás los pilares esenciales para construir un negocio online estable.</li>
+                <li><strong>Gestión financiera básica:</strong> Cómo organizar tus finanzas para tomar mejores decisiones.</li>
+                <li><strong>Primeros pasos en digital:</strong> Guía paso a paso para lanzar tu primer proyecto online con bajo riesgo.</li>
+            </ol>
+        </div>
+        """
     
     st.subheader("📊 Análisis Resumen de tu Situación Financiera")
     col1, col2 = st.columns(2)
@@ -423,6 +502,9 @@ def analizar_situacion_financiera(ingresos, gastos, activos, pasivos):
         <p>{descripcion}</p>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Mostrar recomendaciones de cursos según perfil
+    st.markdown(recomendaciones_cursos, unsafe_allow_html=True)
     
     st.subheader("🔍 Análisis Específico para Bienes Raíces")
     if flujo_caja_mensual > 0:
@@ -464,10 +546,6 @@ def analizar_situacion_financiera(ingresos, gastos, activos, pasivos):
         
         Perfil de Inversión en Bienes Raíces: {perfil}
         {descripcion}
-        
-        Análisis:
-        {'Tienes un flujo de caja positivo que podrías destinar a inversión en propiedades.' if flujo_caja_mensual > 0 else 'Necesitas equilibrar tu flujo de caja antes de considerar inversiones.'}
-        {'Tu patrimonio neto es sólido y podrías usarlo como garantía para financiamiento.' if patrimonio_neto > 50000 else 'Considera fortalecer tu patrimonio antes de inversiones significativas.'}
         """
     }
 
@@ -512,18 +590,26 @@ def generar_plan_trabajo(ingresos, gastos, activos, pasivos):
         st.error(f"Error al generar el plan: {str(e)}")
         return "No se pudo generar el plan en este momento."
 
+# Función para crear tooltip de ayuda con emoji
+def emoji_help_tooltip(text, emoji="🧠"):
+    st.markdown(f"""
+    <span class="emoji-help">{emoji}
+        <span class="help-text">{text}</span>
+    </span>
+    """, unsafe_allow_html=True)
+
 # Interfaz principal de Streamlit
 def main():
     load_css()  # Cargar estilos CSS personalizados
     
-    # Encabezado con logo
-    st.markdown("""
+    # Encabezado con logo en la parte superior derecha
+    st.markdown(f"""
     <div class="header-container">
-        <img src="https://raw.githubusercontent.com/Santospe2000/Calculator_IA/main/cvcc.png" class="logo" alt="Logo Taller Bienes Raíces">
         <div>
             <h1 style="margin:0;color:#1E3A8A;">Taller de Bienes Raíces</h1>
             <h3 style="margin:0;color:#6B7280;">Calculadora Financiera para Inversión Inmobiliaria</h3>
         </div>
+        <img src="https://raw.githubusercontent.com/Santospe2000/Calculator_IA/main/WhatsApp%20Image%202025-05-19%20at%2012.57.14%20PM.jpeg" class="logo" alt="Logo Taller Bienes Raíces">
     </div>
     """, unsafe_allow_html=True)
     
@@ -627,7 +713,8 @@ def main():
                 
                 # Descripción con tooltip
                 with cols[0]:
-                    st.markdown(f"{item['nombre']} <span class='help-icon'><span class='help-text'>{item['help']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item['nombre']} ")
+                    emoji_help_tooltip(item['help'])
                 
                 # Campos de valor y deuda
                 valor = cols[1].text_input(
@@ -679,7 +766,8 @@ def main():
                 
                 # Descripción con tooltip
                 with cols[0]:
-                    st.markdown(f"{item['nombre']} <span class='help-icon'><span class='help-text'>{item['help']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item['nombre']} ")
+                    emoji_help_tooltip(item['help'])
                 
                 # Campos de valor y deuda (para pasivos, valor es el monto total de la deuda)
                 valor = cols[1].text_input(
@@ -788,7 +876,8 @@ def main():
             for item, data in st.session_state['ingresos_values'].items():
                 cols = st.columns([4, 1])
                 with cols[0]:
-                    st.markdown(f"{item} <span class='help-icon'><span class='help-text'>{data['help']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item} ")
+                    emoji_help_tooltip(data['help'])
                 
                 value = cols[1].text_input(
                     f"{item} ($)",
@@ -807,7 +896,8 @@ def main():
             for item, data in st.session_state['gastos_values'].items():
                 cols = st.columns([4, 1])
                 with cols[0]:
-                    st.markdown(f"{item} <span class='help-icon'><span class='help-text'>{data['help']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item} ")
+                    emoji_help_tooltip(data['help'])
                 
                 value = cols[1].text_input(
                     f"{item} ($)",
@@ -822,7 +912,7 @@ def main():
             # Calcular saldo mensual
             saldo_mensual = ingresos_total - gastos_total
             
-            # Mostrar resumen de flujo de caja
+            # Mostrar resumen de flujo de caja (sin mensajes HTML)
             st.markdown(f"""
             <div class="calculator-container">
                 <h4>Resumen Flujo de Caja</h4>
@@ -868,40 +958,6 @@ def main():
                 st.subheader("📝 Plan de Trabajo para Inversión en Bienes Raíces")
                 st.write(plan)
                 st.session_state['reporte_data']['analisis']['plan_trabajo'] = plan
-                
-                # Recomendaciones de cursos según perfil
-                if analisis['perfil_inversion']['nivel'].startswith("Alto"):
-                    cursos = """
-                    Recomendaciones de Cursos:
-                    - Curso Avanzado de Estrategias Inmobiliarias
-                    - Taller de Financiamiento Creativo para Propiedades
-                    - Masterclass en Identificación de Oportunidades
-                    """
-                elif analisis['perfil_inversion']['nivel'].startswith("Medio"):
-                    cursos = """
-                    Recomendaciones de Cursos:
-                    - Curso Intermedio de Inversión en Bienes Raíces
-                    - Taller de Co-Inversiones y Sociedades
-                    - Seminario de Análisis de Mercado Local
-                    """
-                else:
-                    cursos = """
-                    Recomendaciones de Cursos:
-                    - Curso Básico de Educación Financiera
-                    - Taller de Presupuesto y Ahorro
-                    - Introducción a la Inversión en Bienes Raíces
-                    """
-                
-                st.session_state['reporte_data']['analisis']['recomendaciones_cursos'] = cursos
-                
-                # Mostrar recursos adicionales
-                st.subheader("🎓 Recursos Educativos Recomendados")
-                st.markdown("""
-                - [Canal de YouTube de Carlos Devis](https://www.youtube.com/@carlosdevis)
-                - [Ciclo Educativo Taller de Bienes Raíces](https://landing.tallerdebienesraices.com/registro-ciclo-educativo/)
-                - [Playlist: Estrategias Inmobiliarias](https://www.youtube.com/playlist?list=PL2qGhDf0PEjSF5zxLMa6SlVUxPd4273tl)
-                - [Playlist: Financiamiento Creativo](https://www.youtube.com/playlist?list=PL2qGhDf0PEjT9Jy7ULNGfFQvTsruUAyCe)
-                """)
     
     # Paso 3: Plan de inversión en bienes raíces
     if 'datos_financieros' in st.session_state:
@@ -999,8 +1055,10 @@ def main():
                 st.write("2. **Apreciación de capital:** Invierte en zonas con potencial de crecimiento para vender con ganancia al retirarte")
                 st.write("3. **Fondos inmobiliarios (REITs):** Alternativa más líquida para exposición al mercado inmobiliario")
                 
-                st.subheader("🎓 Recursos Educativos para Preparar tu Retiro")
+                st.subheader("🎓 Recursos Educativos Recomendados")
                 st.markdown("""
+                - 🏠 [Cómo Invertir en Bienes Raíces de Forma Segura](https://www.youtube.com/playlist?list=PL2qGhDf0PEjT9Jy7ULNGfFQvTsruUAyCe)
+                - 🏠 [Hábitos que Cambiaron Mi Vida](https://www.youtube.com/playlist?list=PL2qGhDf0PEjR8udXprIe-2kGYpraU9KBJ)
                 - [Curso: Bienes Raíces para el Retiro](https://www.tallerdebienesraices.com/cursos/retiro)
                 - [Seminario: Estrategias de Ingreso Pasivo](https://www.tallerdebienesraices.com/seminarios/ingreso-pasivo)
                 - [Guía: Planificación Financiera para el Retiro](https://www.tallerdebienesraices.com/guias/retiro)
