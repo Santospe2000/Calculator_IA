@@ -501,6 +501,14 @@ def generar_plan_trabajo(ingresos, gastos, activos, pasivos):
         st.error(f"Error al generar el plan: {str(e)}")
         return "No se pudo generar el plan en este momento."
 
+# Función para crear tooltip de ayuda
+def help_tooltip(text):
+    st.markdown(f"""
+    <span class="help-icon">🧠
+        <span class="help-text">{text}</span>
+    </span>
+    """, unsafe_allow_html=True)
+
 # Interfaz principal de Streamlit
 def main():
     load_css()  # Cargar estilos CSS personalizados
@@ -508,7 +516,7 @@ def main():
     # Encabezado con logo
     st.markdown("""
     <div class="header-container">
-        <img src="https://raw.githubusercontent.com/Santospe2000/Calculator_IA/main/cvcc.png" class="logo" alt="Logo Taller Bienes Raíces">
+        <img src="https://via.placeholder.com/60" class="logo" alt="Logo Taller Bienes Raíces">
         <div>
             <h1 style="margin:0;color:#1E3A8A;">Taller de Bienes Raíces</h1>
             <h3 style="margin:0;color:#6B7280;">Calculadora Financiera para Inversión Inmobiliaria</h3>
@@ -604,7 +612,7 @@ def main():
             
             # Encabezados de tabla
             cols = st.columns([3, 1, 1, 1])
-            cols[0].markdown("<b>Descripción 🧠</b>", unsafe_allow_html=True)
+            cols[0].markdown("<b>Descripción</b>", unsafe_allow_html=True)
             cols[1].markdown("<b>Valor ($)</b>", unsafe_allow_html=True)
             cols[2].markdown("<b>Deuda ($)</b>", unsafe_allow_html=True)
             cols[3].markdown("<b>Activo Neto ($)</b>", unsafe_allow_html=True)
@@ -616,7 +624,7 @@ def main():
                 
                 # Descripción con tooltip
                 with cols[0]:
-                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['help']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item['nombre']} <span class='help-icon'>🧠<span class='help-text'>{item['help']}</span></span>", unsafe_allow_html=True)
                 
                 # Campos de valor y deuda
                 valor = cols[1].text_input(
@@ -656,7 +664,7 @@ def main():
             
             # Encabezados de tabla
             cols = st.columns([3, 1, 1, 1])
-            cols[0].markdown("<b>Descripción 🧠</b>", unsafe_allow_html=True)
+            cols[0].markdown("<b>Descripción</b>", unsafe_allow_html=True)
             cols[1].markdown("<b>Valor ($)</b>", unsafe_allow_html=True)
             cols[2].markdown("<b>Deuda ($)</b>", unsafe_allow_html=True)
             cols[3].markdown("<b>Activo Neto ($)</b>", unsafe_allow_html=True)
@@ -668,7 +676,7 @@ def main():
                 
                 # Descripción con tooltip
                 with cols[0]:
-                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['help']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item['nombre']} <span class='help-icon'>🧠<span class='help-text'>{item['help']}</span></span>", unsafe_allow_html=True)
                 
                 # Campos de valor y deuda (para pasivos, valor es el monto total de la deuda)
                 valor = cols[1].text_input(
@@ -771,13 +779,13 @@ def main():
                 }
             
             # Ingresos
-            st.markdown("<h4>Ingresos 🧠</h4>", unsafe_allow_html=True)
+            st.markdown("<h4>Ingresos</h4>", unsafe_allow_html=True)
             ingresos_total = 0.0
             
             for item, data in st.session_state['ingresos_values'].items():
                 cols = st.columns([4, 1])
                 with cols[0]:
-                    st.markdown(f"{item} <span class='help-icon'>?<span class='help-text'>{data['help']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item} <span class='help-icon'>🧠<span class='help-text'>{data['help']}</span></span>", unsafe_allow_html=True)
                 
                 value = cols[1].text_input(
                     f"{item} ($)",
@@ -790,13 +798,13 @@ def main():
                 ingresos_total += parsed_value
             
             # Gastos
-            st.markdown("<h4>Gastos 🧠</h4>", unsafe_allow_html=True)
+            st.markdown("<h4>Gastos</h4>", unsafe_allow_html=True)
             gastos_total = 0.0
             
             for item, data in st.session_state['gastos_values'].items():
                 cols = st.columns([4, 1])
                 with cols[0]:
-                    st.markdown(f"{item} <span class='help-icon'>?<span class='help-text'>{data['help']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item} <span class='help-icon'>🧠<span class='help-text'>{data['help']}</span></span>", unsafe_allow_html=True)
                 
                 value = cols[1].text_input(
                     f"{item} ($)",
