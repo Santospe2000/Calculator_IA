@@ -654,7 +654,7 @@ def main():
                 
                 # Descripción con tooltip
                 with cols[0]:
-                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['help']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item['nombre']} <span class='help-icon' title='{item['help']}'>?</span>", unsafe_allow_html=True)
                 
                 # Campos de valor y deuda
                 valor = cols[1].text_input(
@@ -706,7 +706,7 @@ def main():
                 
                 # Descripción con tooltip
                 with cols[0]:
-                    st.markdown(f"{item['nombre']} <span class='help-icon'>?<span class='help-text'>{item['help']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item['nombre']} <span class='help-icon' title='{item['help']}'>?</span>", unsafe_allow_html=True)
                 
                 # Campos de valor y deuda (para pasivos, valor es el monto total de la deuda)
                 valor = cols[1].text_input(
@@ -815,7 +815,7 @@ def main():
             for item, data in st.session_state['ingresos_values'].items():
                 cols = st.columns([4, 1])
                 with cols[0]:
-                    st.markdown(f"{item} <span class='help-icon'>?<span class='help-text'>{data['help']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item} <span class='help-icon' title='{data['help']}'>?</span>", unsafe_allow_html=True)
                 
                 value = cols[1].text_input(
                     f"{item} ($)",
@@ -834,7 +834,7 @@ def main():
             for item, data in st.session_state['gastos_values'].items():
                 cols = st.columns([4, 1])
                 with cols[0]:
-                    st.markdown(f"{item} <span class='help-icon'>?<span class='help-text'>{data['help']}</span></span>", unsafe_allow_html=True)
+                    st.markdown(f"{item} <span class='help-icon' title='{data['help']}'>?</span>", unsafe_allow_html=True)
                 
                 value = cols[1].text_input(
                     f"{item} ($)",
