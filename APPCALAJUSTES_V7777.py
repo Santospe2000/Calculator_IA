@@ -143,6 +143,33 @@ def load_css():
                 margin-bottom: 15px;
             }
         }
+        
+        /* Estilos para la tabla de ejemplo */
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+        
+        .example-table th, .example-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .example-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        .example-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .example-table tr:hover {
+            background-color: #f1f1f1;
+        }
     </style>
     """, unsafe_allow_html=True)
 
@@ -525,36 +552,154 @@ def main():
             
             st.subheader("💰 Activos y Pasivos")
             
-            # Agregar el ejemplo en un expander
-            with st.expander("📌 Ver ejemplo de cómo llenar esta tabla"):
+            # Tabla de ejemplo como expander
+            with st.expander("📋 Ver tabla de ejemplo para guiarte"):
                 st.markdown("""
-                **Observa el siguiente ejemplo:**
-                
-                | Descripción          | Valor       | Deuda       | Activos     |
-                |----------------------|-------------|-------------|-------------|
-                | Inmueble 1           | $80,000.00  | $30,000.00  | $50,000.00  |
-                | Inmueble 2           |             |             |             |
-                | Automóvil 1          | $15,000.00  | $18,000.00  | $(3,000.00) |
-                | Automóvil 2          |             |             | $-          |
-                | Muebles              | $5,000.00   | $1,500.00   | $3,500.00   |
-                | Joyas                |             |             | $-          |
-                | Arte                 |             |             | $-          |
-                | Efectivo cuenta 1    | $2,000.00   |             | $2,000.00   |
-                | Efectivo cuenta 2    | $1,500.00   |             | $1,500.00   |
-                | Deudas por cobrar    | $3,000.00   |             | $3,000.00   |
-                | Acciones             |             |             | $-          |
-                | Bonos o títulos      |             |             | $-          |
-                | Fondo de retiro      | $30,000.00  |             | $30,000.00  |
-                | Bonos laborales      |             |             | $-          |
-                | Tarjeta crédito 1    |             | $6,500.00   | $(6,500.00) |
-                | Tarjeta crédito 2    |             | $8,200.00   | $(8,200.00) |
-                | Tarjeta crédito 3    |             |             | $-          |
-                | Otra deuda 1         |             | $4,700.00   | $(4,700.00) |
-                | Otra deuda 2         |             |             | $-          |
-                | Otra deuda 3         |             |             | $-          |
-                | Otros               |             |             | $-          |
-                | **Total**           | $136,500.00 | $68,900.00  | $67,600.00  |
-                """)
+                <table class="example-table">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Valor</th>
+                            <th>Deuda</th>
+                            <th>Neto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Inmueble 1</td>
+                            <td>$80,000.00</td>
+                            <td>$30,000.00</td>
+                            <td>$50,000.00</td>
+                        </tr>
+                        <tr>
+                            <td>Inmueble 2</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Automóvil 1</td>
+                            <td>$15,000.00</td>
+                            <td>$18,000.00</td>
+                            <td>$(3,000.00)</td>
+                        </tr>
+                        <tr>
+                            <td>Automóvil 2</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Muebles</td>
+                            <td>$5,000.00</td>
+                            <td>$1,500.00</td>
+                            <td>$3,500.00</td>
+                        </tr>
+                        <tr>
+                            <td>Joyas</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Arte</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Efectivo cuenta 1</td>
+                            <td>$2,000.00</td>
+                            <td></td>
+                            <td>$2,000.00</td>
+                        </tr>
+                        <tr>
+                            <td>Efectivo cuenta 2</td>
+                            <td>$1,500.00</td>
+                            <td></td>
+                            <td>$1,500.00</td>
+                        </tr>
+                        <tr>
+                            <td>Deudas por cobrar</td>
+                            <td>$3,000.00</td>
+                            <td></td>
+                            <td>$3,000.00</td>
+                        </tr>
+                        <tr>
+                            <td>Acciones</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Bonos o títulos valores</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Fondo de retiro</td>
+                            <td>$30,000.00</td>
+                            <td></td>
+                            <td>$30,000.00</td>
+                        </tr>
+                        <tr>
+                            <td>Bonos o derechos laborales</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Tarjeta de crédito 1</td>
+                            <td></td>
+                            <td>$6,500.00</td>
+                            <td>$(6,500.00)</td>
+                        </tr>
+                        <tr>
+                            <td>Tarjeta de crédito 2</td>
+                            <td></td>
+                            <td>$8,200.00</td>
+                            <td>$(8,200.00)</td>
+                        </tr>
+                        <tr>
+                            <td>Tarjeta de crédito 3</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Otra deuda 1</td>
+                            <td></td>
+                            <td>$4,700.00</td>
+                            <td>$(4,700.00)</td>
+                        </tr>
+                        <tr>
+                            <td>Otra deuda 2</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Otra deuda 3</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Otros</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td><strong>$136,500.00</strong></td>
+                            <td><strong>$68,900.00</strong></td>
+                            <td><strong>$67,600.00</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                """, unsafe_allow_html=True)
             
             st.markdown("""
             **Cómo diligenciar esta sección:**
@@ -782,7 +927,7 @@ def main():
                 st.session_state['reporte_data']['analisis']['plan_trabajo'] = plan
     
     # Paso 3: Plan de inversión
-    if 'datos_financieros' in st.session_state:
+    if 'usuario_id' in st.session_state and 'reporte_data' in st.session_state and 'finanzas' in st.session_state['reporte_data']:
         with st.container():
             st.subheader("📈 Plan de Inversión en Bienes Raíces")
             
@@ -814,13 +959,17 @@ def main():
             
             if st.button("Generar estrategia personalizada"):
                 st.session_state['plan_inversion'] = (objetivos, horizonte, ", ".join(estrategias))
-                ingresos, gastos, activos, pasivos = st.session_state['datos_financieros']
+                ingresos = st.session_state['reporte_data']['finanzas']['ingresos']
+                gastos = st.session_state['reporte_data']['finanzas']['gastos']
+                activos = st.session_state['reporte_data']['finanzas']['activos']
+                pasivos = st.session_state['reporte_data']['finanzas']['pasivos']
+                
                 analisis_ia = generar_plan_trabajo(ingresos, gastos, activos, pasivos)
                 st.write(analisis_ia)
                 st.session_state['reporte_data']['analisis']['analisis_ia'] = analisis_ia
     
     # Paso 4: Plan de retiro
-    if 'usuario_id' in st.session_state and 'datos_financieros' in st.session_state:
+    if 'usuario_id' in st.session_state and 'reporte_data' in st.session_state and 'finanzas' in st.session_state['reporte_data']:
         with st.container():
             st.subheader("👴 Plan de Retiro con Bienes Raíces")
             
@@ -833,7 +982,11 @@ def main():
             ahorros_retiro = parse_currency(st.text_input("Ahorros actuales para el retiro ($)", value="$10,000"))
             
             if st.button("Calcular proyección de retiro con bienes raíces"):
-                ingresos, gastos, activos, pasivos = st.session_state['datos_financieros']
+                ingresos = st.session_state['reporte_data']['finanzas']['ingresos']
+                gastos = st.session_state['reporte_data']['finanzas']['gastos']
+                activos = st.session_state['reporte_data']['finanzas']['activos']
+                pasivos = st.session_state['reporte_data']['finanzas']['pasivos']
+                
                 flujo_caja = ingresos - gastos
                 patrimonio_neto = activos - pasivos
                 
