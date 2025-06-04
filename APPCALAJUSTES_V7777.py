@@ -143,23 +143,6 @@ def load_css():
                 margin-bottom: 15px;
             }
         }
-        
-        .example-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-            font-size: 0.9em;
-        }
-        
-        .example-table th, .example-table td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .example-table th {
-            background-color: #f2f2f2;
-        }
     </style>
     """, unsafe_allow_html=True)
 
@@ -542,150 +525,36 @@ def main():
             
             st.subheader("💰 Activos y Pasivos")
             
-            # Añadir el box desplegable con el ejemplo de tabla
-            with st.expander("📌 Observa el siguiente ejemplo antes de llenar la tabla"):
+            # Agregar el ejemplo en un expander
+            with st.expander("📌 Ver ejemplo de cómo llenar esta tabla"):
                 st.markdown("""
-                <table class="example-table">
-                    <tr>
-                        <th>Descripción</th>
-                        <th>Valor</th>
-                        <th>Deuda</th>
-                        <th>Neto</th>
-                    </tr>
-                    <tr>
-                        <td>Inmueble 1</td>
-                        <td>$80,000.00</td>
-                        <td>$30,000.00</td>
-                        <td>$50,000.00</td>
-                    </tr>
-                    <tr>
-                        <td>Inmueble 2</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Automóvil 1</td>
-                        <td>$15,000.00</td>
-                        <td>$18,000.00</td>
-                        <td>$(3,000.00)</td>
-                    </tr>
-                    <tr>
-                        <td>Automóvil 2</td>
-                        <td></td>
-                        <td></td>
-                        <td>$0.00</td>
-                    </tr>
-                    <tr>
-                        <td>Muebles</td>
-                        <td>$5,000.00</td>
-                        <td>$1,500.00</td>
-                        <td>$3,500.00</td>
-                    </tr>
-                    <tr>
-                        <td>Joyas</td>
-                        <td></td>
-                        <td></td>
-                        <td>$0.00</td>
-                    </tr>
-                    <tr>
-                        <td>Arte</td>
-                        <td></td>
-                        <td></td>
-                        <td>$0.00</td>
-                    </tr>
-                    <tr>
-                        <td>Efectivo cuenta 1</td>
-                        <td>$2,000.00</td>
-                        <td></td>
-                        <td>$2,000.00</td>
-                    </tr>
-                    <tr>
-                        <td>Efectivo cuenta 2</td>
-                        <td>$1,500.00</td>
-                        <td></td>
-                        <td>$1,500.00</td>
-                    </tr>
-                    <tr>
-                        <td>Deudas por cobrar</td>
-                        <td>$3,000.00</td>
-                        <td></td>
-                        <td>$3,000.00</td>
-                    </tr>
-                    <tr>
-                        <td>Acciones</td>
-                        <td></td>
-                        <td></td>
-                        <td>$0.00</td>
-                    </tr>
-                    <tr>
-                        <td>Bonos o títulos valores</td>
-                        <td></td>
-                        <td></td>
-                        <td>$0.00</td>
-                    </tr>
-                    <tr>
-                        <td>Fondo de retiro</td>
-                        <td>$30,000.00</td>
-                        <td></td>
-                        <td>$30,000.00</td>
-                    </tr>
-                    <tr>
-                        <td>Bonos o derechos laborales</td>
-                        <td></td>
-                        <td></td>
-                        <td>$0.00</td>
-                    </tr>
-                    <tr>
-                        <td>Tarjeta de crédito 1</td>
-                        <td></td>
-                        <td>$6,500.00</td>
-                        <td>$(6,500.00)</td>
-                    </tr>
-                    <tr>
-                        <td>Tarjeta de crédito 2</td>
-                        <td></td>
-                        <td>$8,200.00</td>
-                        <td>$(8,200.00)</td>
-                    </tr>
-                    <tr>
-                        <td>Tarjeta de crédito 3</td>
-                        <td></td>
-                        <td></td>
-                        <td>$0.00</td>
-                    </tr>
-                    <tr>
-                        <td>Otra deuda 1</td>
-                        <td></td>
-                        <td>$4,700.00</td>
-                        <td>$(4,700.00)</td>
-                    </tr>
-                    <tr>
-                        <td>Otra deuda 2</td>
-                        <td></td>
-                        <td></td>
-                        <td>$0.00</td>
-                    </tr>
-                    <tr>
-                        <td>Otra deuda 3</td>
-                        <td></td>
-                        <td></td>
-                        <td>$0.00</td>
-                    </tr>
-                    <tr>
-                        <td>Otros</td>
-                        <td></td>
-                        <td></td>
-                        <td>$0.00</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Total</strong></td>
-                        <td><strong>$136,500.00</strong></td>
-                        <td><strong>$68,900.00</strong></td>
-                        <td><strong>$67,600.00</strong></td>
-                    </tr>
-                </table>
-                """, unsafe_allow_html=True)
+                **Observa el siguiente ejemplo:**
+                
+                | Descripción          | Valor       | Deuda       | Activos     |
+                |----------------------|-------------|-------------|-------------|
+                | Inmueble 1           | $80,000.00  | $30,000.00  | $50,000.00  |
+                | Inmueble 2           |             |             |             |
+                | Automóvil 1          | $15,000.00  | $18,000.00  | $(3,000.00) |
+                | Automóvil 2          |             |             | $-          |
+                | Muebles              | $5,000.00   | $1,500.00   | $3,500.00   |
+                | Joyas                |             |             | $-          |
+                | Arte                 |             |             | $-          |
+                | Efectivo cuenta 1    | $2,000.00   |             | $2,000.00   |
+                | Efectivo cuenta 2    | $1,500.00   |             | $1,500.00   |
+                | Deudas por cobrar    | $3,000.00   |             | $3,000.00   |
+                | Acciones             |             |             | $-          |
+                | Bonos o títulos      |             |             | $-          |
+                | Fondo de retiro      | $30,000.00  |             | $30,000.00  |
+                | Bonos laborales      |             |             | $-          |
+                | Tarjeta crédito 1    |             | $6,500.00   | $(6,500.00) |
+                | Tarjeta crédito 2    |             | $8,200.00   | $(8,200.00) |
+                | Tarjeta crédito 3    |             |             | $-          |
+                | Otra deuda 1         |             | $4,700.00   | $(4,700.00) |
+                | Otra deuda 2         |             |             | $-          |
+                | Otra deuda 3         |             |             | $-          |
+                | Otros               |             |             | $-          |
+                | **Total**           | $136,500.00 | $68,900.00  | $67,600.00  |
+                """)
             
             st.markdown("""
             **Cómo diligenciar esta sección:**
