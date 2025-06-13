@@ -748,16 +748,10 @@ def main():
             if 'pasivos_values' not in st.session_state:
                 st.session_state['pasivos_values'] = {item['nombre']: {"valor": 0.0, "deuda": 0.0} for item in pasivos_items}
             
-            # Tabla de activos con los nuevos títulos
+            # Tabla de activos
             st.markdown("### Activos")
             activos_total = {"valor": 0.0, "deuda": 0.0, "neto": 0.0}
             
-            # Encabezados de columna modificados
-            cols = st.columns([3, 1, 1, 1])
-            with cols[1]: st.markdown("**Valor ($)**")
-            with cols[2]: st.markdown("**Deuda ($)**")
-            with cols[3]: st.markdown("**Activo Neto ($)**")
-
             for item in activos_items:
                 cols = st.columns([3, 1, 1, 1])
                 
@@ -794,16 +788,10 @@ def main():
                 activos_total["deuda"] += deuda_parsed
                 activos_total["neto"] += neto
             
-            # Tabla de pasivos con los nuevos títulos
+            # Tabla de pasivos
             st.markdown("### Pasivos")
             pasivos_total = {"valor": 0.0, "deuda": 0.0, "neto": 0.0}
             
-            # Encabezados de columna modificados
-            cols = st.columns([3, 1, 1, 1])
-            with cols[1]: st.markdown("**Valor ($)**")
-            with cols[2]: st.markdown("**Deuda ($)**")
-            with cols[3]: st.markdown("**Activo Neto ($)**")
-
             for item in pasivos_items:
                 cols = st.columns([3, 1, 1, 1])
                 
