@@ -6,12 +6,11 @@ import base64
 from io import BytesIO
 import re
 import os
-from datetime import datetime
 
 # Configuración inicial de la página
 st.set_page_config(
     page_title="Taller de Bienes Raíces",
-    page_icon="🏠",
+    page_icon="💰",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -34,55 +33,50 @@ def load_css():
     st.markdown("""
     <style>
         :root {
-            --primary: #1E3A8A;
-            --secondary: #6B7280;
-            --success: #10B981;
-            --danger: #EF4444;
-            --light: #F9FAFB;
-            --dark: #111827;
-            --white: #FFFFFF;
+            --azul-oscuro: #1E3A8A;
+            --gris: #6B7280;
+            --blanco: #FFFFFF;
+            --verde: #10B981;
+            --rojo: #EF4444;
         }
         
         .stApp {
-            max-width: 1000px;
+            max-width: 900px;
             margin: auto;
             font-family: 'Arial', sans-serif;
-            background-color: var(--light);
+            background-color: #F9FAFB;
         }
         
         .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
-            padding: 1rem 0;
-            border-bottom: 2px solid var(--primary);
+            margin-bottom: 20px;
         }
         
         .logo {
-            height: 90px;
+            height: 80px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        .card {
-            background-color: var(--white);
-            border-radius: 12px;
-            padding: 1.5rem;
+        .calculator-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
             border: 1px solid #E5E7EB;
         }
         
         .stButton>button {
-            background-color: var(--primary);
-            color: var(--white);
+            background-color: var(--azul-oscuro);
+            color: white;
             border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
+            padding: 10px 24px;
+            font-weight: bold;
             width: 100%;
             transition: all 0.3s ease;
-            border: none;
         }
         
         .stButton>button:hover {
@@ -96,128 +90,47 @@ def load_css():
         .stSelectbox>div>div>select,
         .stMultiselect>div>div>div {
             border-radius: 8px;
-            border: 1px solid var(--secondary);
-            padding: 0.75rem;
+            border: 1px solid var(--gris);
+            padding: 10px;
         }
         
         .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-            color: var(--primary);
+            color: var(--azul-oscuro);
         }
         
-        .positive {
-            color: var(--success);
-            font-weight: 600;
+        .positive-value {
+            color: var(--verde);
+            font-weight: bold;
         }
         
-        .negative {
-            color: var(--danger);
-            font-weight: 600;
+        .negative-value {
+            color: var(--rojo);
+            font-weight: bold;
         }
         
         .help-icon {
             display: inline-flex;
             align-items: center;
             cursor: pointer;
-            margin-left: 0.5rem;
-            color: var(--primary);
+            margin-left: 5px;
         }
         
         .help-text {
             display: none;
             position: absolute;
-            background-color: var(--white);
-            border: 1px solid var(--secondary);
-            padding: 0.75rem;
-            border-radius: 8px;
+            background-color: white;
+            border: 1px solid var(--gris);
+            padding: 10px;
+            border-radius: 5px;
             z-index: 100;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            width: 300px;
-            left: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            width: 250px;
+            left: 20px;
             top: 0;
-            font-size: 0.9rem;
         }
         
         .help-icon:hover .help-text {
             display: block;
-        }
-        
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-        }
-        
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
-            font-size: 0.95rem;
-        }
-        
-        .data-table th {
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 0.75rem;
-            text-align: left;
-        }
-        
-        .data-table td {
-            border: 1px solid #E5E7EB;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        
-        .data-table tr:nth-child(even) {
-            background-color: #F9FAFB;
-        }
-        
-        .data-table tr:hover {
-            background-color: #F3F4F6;
-        }
-        
-        .total-row {
-            background-color: #EFF6FF !important;
-            font-weight: 600;
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .badge-primary {
-            background-color: #DBEAFE;
-            color: var(--primary);
-        }
-        
-        .badge-success {
-            background-color: #D1FAE5;
-            color: var(--success);
-        }
-        
-        .badge-warning {
-            background-color: #FEF3C7;
-            color: #92400E;
-        }
-        
-        .badge-danger {
-            background-color: #FEE2E2;
-            color: var(--danger);
-        }
-        
-        .progress-container {
-            width: 100%;
-            background-color: #E5E7EB;
-            border-radius: 50px;
-            margin: 0.5rem 0;
-        }
-        
-        .progress-bar {
-            height: 10px;
-            border-radius: 50px;
-            background-color: var(--primary);
         }
         
         @media (max-width: 768px) {
@@ -227,35 +140,50 @@ def load_css():
             }
             
             .logo {
-                margin: 1rem 0;
+                margin-bottom: 15px;
             }
-            
-            .help-text {
-                width: 250px;
-                left: 0;
-                top: 1.5rem;
-            }
+        }
+        
+        /* Estilos para la tabla de ejemplo */
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+        
+        .example-table th, .example-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .example-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        .example-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .example-table tr:hover {
+            background-color: #f1f1f1;
         }
     </style>
     """, unsafe_allow_html=True)
 
 # Funciones utilitarias
 def format_currency(value):
-    """Formatea un valor numérico como moneda"""
-    return f"${value:,.2f}" if isinstance(value, (int, float)) else "$0.00"
+    return f"${value:,.2f}" if value else "$0.00"
 
 def parse_currency(currency_str):
-    """Convierte un string de moneda a valor numérico"""
     if not currency_str:
         return 0.0
-    try:
-        num_str = re.sub(r'[^\d.]', '', str(currency_str))
-        return float(num_str) if num_str else 0.0
-    except:
-        return 0.0
+    num_str = re.sub(r'[^\d.]', '', currency_str)
+    return float(num_str) if num_str else 0.0
 
-def emoji_help_tooltip(text, emoji="ℹ️"):
-    """Muestra un tooltip de ayuda con emoji"""
+def emoji_help_tooltip(text, emoji="🧠"):
     st.markdown(f"""
     <span class="help-icon">
         {emoji}
@@ -263,277 +191,293 @@ def emoji_help_tooltip(text, emoji="ℹ️"):
     </span>
     """, unsafe_allow_html=True)
 
-def validate_email(email):
-    """Valida el formato de un email"""
-    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-    return re.match(pattern, email) is not None
-
 # Funciones de base de datos
-def init_database():
-    """Inicializa la base de datos SQLite"""
-    conn = sqlite3.connect('real_estate_workshop.db')
+def crear_base_datos():
+    conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
-    
-    # Tabla de usuarios
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE IF NOT EXISTS usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            age INTEGER NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            phone TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            nombre TEXT,
+            edad INTEGER,
+            email TEXT,
+            telefono TEXT
         )
     ''')
-    
-    # Tabla de finanzas
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS finances (
+        CREATE TABLE IF NOT EXISTS finanzas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            monthly_income REAL NOT NULL,
-            monthly_expenses REAL NOT NULL,
-            total_assets REAL NOT NULL,
-            total_liabilities REAL NOT NULL,
-            net_worth REAL NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(user_id) REFERENCES users(id)
+            usuario_id INTEGER,
+            ingresos_mensuales REAL,
+            gastos_mensuales REAL,
+            activos_totales REAL,
+            pasivos_totales REAL,
+            FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
         )
     ''')
-    
-    # Tabla de objetivos de inversión
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS investment_goals (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            objectives TEXT NOT NULL,
-            time_horizon TEXT NOT NULL,
-            strategies TEXT NOT NULL,
-            risk_tolerance TEXT,
-            notes TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(user_id) REFERENCES users(id)
-        )
-    ''')
-    
     conn.commit()
     conn.close()
 
-def save_user_data(name, age, email, phone):
-    """Guarda los datos del usuario en la base de datos"""
-    if age < 18:
+def registrar_usuario(nombre, edad, email, telefono):
+    if edad < 18:
         st.warning("Debes ser mayor de 18 años para usar este programa.")
         return None
-    
-    if not validate_email(email):
-        st.warning("Por favor ingresa un email válido.")
-        return None
-    
-    try:
-        conn = sqlite3.connect('real_estate_workshop.db')
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO users (name, age, email, phone)
-            VALUES (?, ?, ?, ?)
-        ''', (name, age, email, phone))
-        user_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
-        return user_id
-    except sqlite3.IntegrityError:
-        st.error("Este email ya está registrado. Por favor usa otro.")
-        return None
-    except Exception as e:
-        st.error(f"Error al guardar los datos: {str(e)}")
-        return None
-
-def save_financial_data(user_id, income, expenses, assets, liabilities, net_worth):
-    """Guarda los datos financieros del usuario"""
-    try:
-        conn = sqlite3.connect('real_estate_workshop.db')
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO finances (user_id, monthly_income, monthly_expenses, 
-                                total_assets, total_liabilities, net_worth)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (user_id, income, expenses, assets, liabilities, net_worth))
-        conn.commit()
-        conn.close()
-        return True
-    except Exception as e:
-        st.error(f"Error al guardar los datos financieros: {str(e)}")
-        return False
-
-def save_investment_goals(user_id, objectives, horizon, strategies, risk=None, notes=None):
-    """Guarda los objetivos de inversión del usuario"""
-    try:
-        conn = sqlite3.connect('real_estate_workshop.db')
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO investment_goals (user_id, objectives, time_horizon, 
-                                        strategies, risk_tolerance, notes)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (user_id, objectives, horizon, strategies, risk, notes))
-        conn.commit()
-        conn.close()
-        return True
-    except Exception as e:
-        st.error(f"Error al guardar los objetivos de inversión: {str(e)}")
-        return False
+    conn = sqlite3.connect('usuarios.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO usuarios (nombre, edad, email, telefono)
+        VALUES (?, ?, ?, ?)
+    ''', (nombre, edad, email, telefono))
+    usuario_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return usuario_id
 
 # Funciones de análisis financiero
-def calculate_net_worth(assets, liabilities):
-    """Calcula el patrimonio neto"""
-    return assets - liabilities
-
-def calculate_cash_flow(income, expenses):
-    """Calcula el flujo de caja mensual"""
-    return income - expenses
-
-def analyze_financial_profile(income, expenses, assets, liabilities):
-    """Analiza el perfil financiero para inversión en bienes raíces"""
-    cash_flow = calculate_cash_flow(income, expenses)
-    net_worth = calculate_net_worth(assets, liabilities)
+def analizar_proyeccion_retiro(edad_actual, edad_retiro, ingresos_retiro, gastos_retiro, ahorros_retiro, patrimonio_neto, flujo_caja):
+    años_ahorro = edad_retiro - edad_actual
+    necesidad_total = (ingresos_retiro - gastos_retiro) * (100 - edad_retiro)
+    ahorro_necesario_anual = (necesidad_total - ahorros_retiro) / años_ahorro if años_ahorro > 0 else 0
     
-    # Análisis de capacidad de inversión
-    if net_worth > 100000 and cash_flow > 2000:
-        profile = {
-            "level": "Avanzado",
-            "description": "Excelente capacidad para inversión en bienes raíces. Puedes considerar propiedades de alto valor y diversificar tu portafolio.",
-            "recommendations": [
-                "Propiedades multifamiliares o comerciales",
-                "Fondos de inversión inmobiliaria (REITs)",
-                "Desarrollos de vivienda"
-            ],
-            "risk": "Moderado-Alto"
-        }
-    elif net_worth > 50000 and cash_flow > 1000:
-        profile = {
-            "level": "Intermedio",
-            "description": "Buena capacidad para inversión. Considera comenzar con propiedades pequeñas o medianas.",
-            "recommendations": [
-                "Viviendas unifamiliares en alquiler",
-                "Propiedades en remodelación",
-                "Co-inversiones con otros socios"
-            ],
-            "risk": "Moderado"
-        }
-    elif net_worth > 0 and cash_flow > 500:
-        profile = {
-            "level": "Principiante",
-            "description": "Puedes comenzar con inversiones pequeñas en bienes raíces mientras mejoras tu situación financiera.",
-            "recommendations": [
-                "Alquiler de habitaciones",
-                "Propiedades en remate bancario",
-                "Terrenos con potencial"
-            ],
-            "risk": "Bajo-Moderado"
-        }
+    if patrimonio_neto > 50000 and flujo_caja > 1000:
+        nivel = "Alto"
+        recomendaciones = [
+            "Tienes un excelente perfil para comenzar a invertir en bienes raíces de inmediato.",
+            "Considera propiedades generadoras de ingresos pasivos como apartamentos en arriendo o locales comerciales."
+        ]
+        cursos_recomendados = ["Curso Avanzado de Inversión en Bienes Raíces"]
+    elif patrimonio_neto > 20000 and flujo_caja > 500:
+        nivel = "Medio"
+        recomendaciones = [
+            "Tienes potencial para inversión en bienes raíces, pero necesitas mejorar tu flujo de caja.",
+            "Considera comenzar con propiedades pequeñas o co-inversiones."
+        ]
+        cursos_recomendados = ["Curso Intermedio de Bienes Raíces"]
     else:
-        profile = {
-            "level": "Preparación",
-            "description": "Enfócate en mejorar tu flujo de caja y reducir deudas antes de invertir en propiedades.",
-            "recommendations": [
-                "Educación financiera",
-                "Ahorro sistemático",
-                "Reducción de deudas"
-            ],
-            "risk": "Bajo"
-        }
+        nivel = "Bajo"
+        recomendaciones = [
+            "Necesitas fortalecer tu situación financiera antes de invertir en bienes raíces.",
+            "Enfócate en aumentar tus ingresos y reducir deudas."
+        ]
+        cursos_recomendados = ["Curso Básico de Educación Financiera para Bienes Raíces"]
     
     return {
-        "cash_flow": cash_flow,
-        "net_worth": net_worth,
-        "profile": profile,
-        "summary": f"""
-        **Resumen Financiero:**
-        - Ingresos Mensuales: {format_currency(income)}
-        - Gastos Mensuales: {format_currency(expenses)}
-        - Flujo de Caja: {format_currency(cash_flow)} ({'Positivo' if cash_flow >= 0 else 'Negativo'})
-        - Activos Totales: {format_currency(assets)}
-        - Pasivos Totales: {format_currency(liabilities)}
-        - Patrimonio Neto: {format_currency(net_worth)}
+        "años_ahorro": años_ahorro,
+        "necesidad_total": necesidad_total,
+        "ahorro_necesario_anual": ahorro_necesario_anual,
+        "nivel_inversion": nivel,
+        "analisis": f"""
+        Proyección de Retiro con Enfoque en Bienes Raíces:
+        - Años hasta el retiro: {años_ahorro}
+        - Necesidad total estimada: {format_currency(necesidad_total)}
+        - Ahorros actuales: {format_currency(ahorros_retiro)}
+        - Necesitas ahorrar aproximadamente {format_currency(ahorro_necesario_anual)} anuales para alcanzar tu meta.
         
-        **Perfil de Inversión:** {profile['level']}
-        {profile['description']}
+        Perfil de Inversión: {nivel}
+        
+        Recomendaciones Específicas:
+        {"\n".join(recomendaciones)}
+        
+        Cursos Recomendados:
+        {"\n".join(cursos_recomendados)}
         """
     }
 
-def generate_retirement_plan(current_age, retirement_age, retirement_income, retirement_expenses, current_savings, net_worth, cash_flow):
-    """Genera un plan de retiro con enfoque en bienes raíces"""
-    years_to_retirement = retirement_age - current_age
-    annual_need = retirement_income - retirement_expenses
-    total_need = annual_need * (100 - retirement_age)  # Estimación simplificada
-    required_annual_savings = (total_need - current_savings) / years_to_retirement if years_to_retirement > 0 else 0
+def analizar_situacion_financiera(ingresos, gastos, activos, pasivos):
+    flujo_caja_mensual = ingresos - gastos
+    patrimonio_neto = activos - pasivos
     
-    # Recomendaciones basadas en el perfil
-    if net_worth > 500000 and cash_flow > 3000:
-        strategy = "Portafolio diversificado de propiedades generadoras de ingresos pasivos"
-        properties_needed = max(1, round(total_need / 30000))  # Estimación de $30k anual por propiedad
-    elif net_worth > 200000 and cash_flow > 1500:
-        strategy = "Combinación de propiedades en alquiler y fondos inmobiliarios"
-        properties_needed = max(1, round(total_need / 40000))
+    if patrimonio_neto > 50000 and flujo_caja_mensual > 1000:
+        perfil = "Alto (70-100%)"
+        descripcion = "Excelente perfil para inversión en bienes raíces. Tienes la capacidad financiera para comenzar a invertir en propiedades generadoras de ingresos pasivos."
+        recomendaciones = mostrar_recomendacion_curso(
+            "🚀 Recomendación para tu Perfil Alto",
+            "Mentoría Avanzada en Tiendas Online",
+            "https://landing.carlosdevis.com/mentoria-tienda-online",
+            [
+                "Estrategias avanzadas de escalamiento",
+                "Automatización de procesos",
+                "Fuentes alternativas de ingreso"
+            ]
+        )
+    elif patrimonio_neto > 20000 and flujo_caja_mensual > 500:
+        perfil = "Medio (40-69%)"
+        descripcion = "Buen potencial para inversión en bienes raíces. Considera comenzar con propiedades pequeñas o co-inversiones mientras mejoras tu flujo de caja."
+        recomendaciones = mostrar_recomendacion_curso(
+            "📈 Recomendación para tu Perfil Medio",
+            "Programa Avanzado en Tiendas Online",
+            "https://landing.carlosdevis.com/cv-avanzado-tienda-online",
+            [
+                "Modelos de negocio probados",
+                "Tácticas de conversión",
+                "Fuentes de tráfico escalables"
+            ]
+        )
     else:
-        strategy = "Enfoque en ahorro sistemático y pequeñas inversiones inmobiliarias"
-        properties_needed = 0
+        perfil = "Bajo (0-39%)"
+        descripcion = "Necesitas fortalecer tu situación financiera antes de invertir en bienes raíces. Enfócate en aumentar ingresos, reducir deudas y ahorrar."
+        recomendaciones = mostrar_recomendacion_curso(
+            "📚 Recomendación para tu Perfil Bajo",
+            "Programa Avanzado en Tiendas Online",
+            "https://landing.carlosdevis.com/cv-avanzado-tienda-online",
+            [
+                "Fundamentos sólidos",
+                "Gestión financiera básica",
+                "Primeros pasos en digital"
+            ]
+        )
+    
+    # Mostrar métricas
+    st.subheader("📊 Análisis Resumen de tu Situación Financiera")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.metric("Ingresos Mensuales", format_currency(ingresos))
+        st.metric("Gastos Mensuales", format_currency(gastos))
+        st.metric("Flujo de Caja Mensual", format_currency(flujo_caja_mensual), 
+                 delta="Positivo" if flujo_caja_mensual > 0 else "Negativo",
+                 delta_color="normal" if flujo_caja_mensual > 0 else "inverse")
+    
+    with col2:
+        st.metric("Activos Totales", format_currency(activos))
+        st.metric("Pasivos Totales", format_currency(pasivos))
+        st.metric("Patrimonio Neto", format_currency(patrimonio_neto), 
+                 delta="Positivo" if patrimonio_neto > 0 else "Negativo",
+                 delta_color="normal" if patrimonio_neto > 0 else "inverse")
+    
+    # Mostrar perfil y recomendaciones
+    st.subheader("🏡 Perfil de Inversión en Bienes Raíces")
+    st.markdown(f"**Nivel:** {perfil}")
+    st.markdown(descripcion)
+    
+    st.markdown(recomendaciones)
+    
+    # Análisis específico
+    st.subheader("🔍 Análisis Específico para Bienes Raíces")
+    if flujo_caja_mensual > 0:
+        st.success(f"Flujo de caja positivo de {format_currency(flujo_caja_mensual)}/mes. Podrías destinar parte de este excedente a inversión en propiedades.")
+    else:
+        st.error(f"Flujo de caja negativo de {format_currency(abs(flujo_caja_mensual))}/mes. Necesitas equilibrar tus finanzas antes de considerar inversiones.")
+    
+    if patrimonio_neto > 50000:
+        st.success("Patrimonio neto sólido. Podrías usar parte como garantía para financiamiento de propiedades.")
+    elif patrimonio_neto > 0:
+        st.warning("Patrimonio neto positivo pero modesto. Considera estrategias de bajo riesgo como alquiler de habitaciones.")
+    else:
+        st.error("Patrimonio neto negativo. Enfócate en reducir deudas antes de invertir.")
     
     return {
-        "years_to_retirement": years_to_retirement,
-        "annual_need": annual_need,
-        "total_need": total_need,
-        "required_annual_savings": required_annual_savings,
-        "strategy": strategy,
-        "properties_needed": properties_needed,
-        "analysis": f"""
-        **Proyección de Retiro con Bienes Raíces**
+        "flujo_caja": flujo_caja_mensual,
+        "patrimonio": patrimonio_neto,
+        "perfil_inversion": {"nivel": perfil, "descripcion": descripcion},
+        "resumen": f"""
+        Situación Financiera Actual:
+        - Ingresos Mensuales: {format_currency(ingresos)}
+        - Gastos Mensuales: {format_currency(gastos)}
+        - Flujo de Caja: {format_currency(flujo_caja_mensual)} ({'Positivo' if flujo_caja_mensual > 0 else 'Negativo'})
+        - Activos Totales: {format_currency(activos)}
+        - Pasivos Totales: {format_currency(pasivos)}
+        - Patrimonio Neto: {format_currency(patrimonio_neto)} ({'Positivo' if patrimonio_neto > 0 else 'Negativo'})
         
-        - **Años hasta el retiro:** {years_to_retirement}
-        - **Necesidad anual en retiro:** {format_currency(annual_need)}
-        - **Necesidad total estimada:** {format_currency(total_need)}
-        - **Ahorros actuales:** {format_currency(current_savings)}
-        - **Ahorro anual requerido:** {format_currency(required_annual_savings)}
-        
-        **Estrategia Recomendada:**
-        {strategy}
-        
-        **Propiedades estimadas necesarias:** {properties_needed}
-        
-        **Acciones clave:**
-        1. Establece un plan de ahorro sistemático
-        2. Educarte sobre inversión en bienes raíces
-        3. Comenzar con pequeñas inversiones y escalar
-        4. Diversificar tu portafolio inmobiliario
+        Perfil de Inversión en Bienes Raíces: {perfil}
+        {descripcion}
         """
     }
 
-def generate_investment_plan(income, expenses, assets, liabilities, objectives, horizon, strategies):
-    """Genera un plan de inversión personalizado usando IA"""
+def mostrar_recomendacion_curso(titulo, curso, enlace, tips):
+    return f"""
+    **{titulo}**  
+    **Curso recomendado:** {curso}  
+    [Enlace al curso]({enlace})
+    
+    **3 Tips importantes:**
+    1. **{tips[0]}**
+    2. **{tips[1]}**
+    3. **{tips[2]}**
+    """
+
+def generar_pdf(usuario_data, finanzas_data, analisis_data):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    # Encabezado
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(200, 10, txt="Informe Financiero - Taller de Bienes Raíces", ln=1, align='C')
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(200, 10, txt="Análisis de Inversión en Bienes Raíces", ln=1, align='C')
+    pdf.ln(10)
+    
+    # Datos personales
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(200, 10, txt="Datos Personales:", ln=1)
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 10, txt=f"Nombre: {usuario_data.get('nombre', '')}", ln=1)
+    pdf.cell(200, 10, txt=f"Edad: {usuario_data.get('edad', '')}", ln=1)
+    pdf.cell(200, 10, txt=f"Email: {usuario_data.get('email', '')}", ln=1)
+    pdf.ln(5)
+    
+    # Datos financieros
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(200, 10, txt="Situación Financiera:", ln=1)
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 10, txt=f"Ingresos Mensuales: {format_currency(finanzas_data.get('ingresos', 0))}", ln=1)
+    pdf.cell(200, 10, txt=f"Gastos Mensuales: {format_currency(finanzas_data.get('gastos', 0))}", ln=1)
+    pdf.cell(200, 10, txt=f"Activos Totales: {format_currency(finanzas_data.get('activos', 0))}", ln=1)
+    pdf.cell(200, 10, txt=f"Pasivos Totales: {format_currency(finanzas_data.get('pasivos', 0))}", ln=1)
+    pdf.ln(5)
+    
+    # Perfil de inversión
+    if 'perfil_inversion' in analisis_data:
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(200, 10, txt=f"Perfil de Inversión en Bienes Raíces: {analisis_data['perfil_inversion']['nivel']}", ln=1)
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(0, 10, txt=analisis_data['perfil_inversion']['descripcion'])
+        pdf.ln(5)
+    
+    # Análisis
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(200, 10, txt="Análisis y Recomendaciones:", ln=1)
+    pdf.set_font("Arial", size=12)
+    pdf.multi_cell(0, 10, txt=analisis_data.get('resumen', ''))
+    pdf.ln(5)
+    
+    # Plan de trabajo
+    if 'plan_trabajo' in analisis_data:
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(200, 10, txt="Plan de Trabajo Personalizado:", ln=1)
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(0, 10, txt=analisis_data['plan_trabajo'])
+    
+    # Generar el PDF en memoria
+    pdf_output = BytesIO()
+    pdf.output(pdf_output)
+    pdf_bytes = pdf_output.getvalue()
+    pdf_output.close()
+    
+    return pdf_bytes
+
+def generar_plan_trabajo(ingresos, gastos, activos, pasivos):
     if not st.session_state.get('openai_configured', False):
-        return {
-            "plan": "Servicio de IA no disponible. Configura tu clave de OpenAI API para habilitar esta función.",
-            "courses": []
-        }
+        return "Servicio de IA no disponible. Configura tu clave de OpenAI API para habilitar esta función."
     
     prompt = f"""
-    Como experto en inversión en bienes raíces, analiza esta situación financiera:
-    - Ingresos mensuales: {format_currency(income)}
-    - Gastos mensuales: {format_currency(expenses)}
-    - Activos totales: {format_currency(assets)}
-    - Pasivos totales: {format_currency(liabilities)}
-    - Patrimonio neto: {format_currency(assets - liabilities)}
+    Como experto en bienes raíces y finanzas personales, analiza esta situación:
+    - Ingresos: {format_currency(ingresos)}/mes
+    - Gastos: {format_currency(gastos)}/mes
+    - Activos: {format_currency(activos)}
+    - Pasivos: {format_currency(pasivos)}
     
-    Objetivos del cliente: {objectives}
-    Horizonte de tiempo: {horizon}
-    Estrategias de interés: {strategies}
-    
-    Genera un plan detallado que incluya:
+    Crea un plan detallado para inversión en bienes raíces que incluya:
     1. Diagnóstico de la situación actual
-    2. Estrategias personalizadas para alcanzar los objetivos
-    3. Plan de acción con hitos a 3, 6 y 12 meses
-    4. Recomendaciones de cursos y recursos educativos
-    5. Análisis de riesgos y mitigaciones
+    2. Estrategias para mejorar flujo de caja
+    3. Plan de reducción de deudas
+    4. Recomendaciones de inversión personalizadas
+    5. Metas a corto, mediano y largo plazo
+    6. Ejercicios prácticos
+    7. Recomendaciones de cursos
     
-    Usa un lenguaje claro y motivador, con ejemplos concretos.
+    Usa lenguaje claro y motivador, con ejemplos concretos.
     Respuesta en español.
     """
     
@@ -542,487 +486,554 @@ def generate_investment_plan(income, expenses, assets, liabilities, objectives, 
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "Eres un asesor financiero especializado en bienes raíces. Proporciona recomendaciones prácticas y personalizadas."},
+                    {"role": "system", "content": "Eres un asesor experto en inversión en bienes raíces. Responde en español con enfoque práctico."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.7,
-                max_tokens=1500
+                temperature=0.7
             )
-            
-        plan = response.choices[0].message.content
-        
-        # Extraer recomendaciones de cursos (simulado)
-        courses = [
-            "Curso Básico de Inversión en Bienes Raíces",
-            "Estrategias de Financiamiento Inmobiliario",
-            "Gestión de Propiedades en Alquiler"
-        ]
-        
-        return {
-            "plan": plan,
-            "courses": courses
-        }
+        return response.choices[0].message.content
     except Exception as e:
         st.error(f"Error al generar el plan: {str(e)}")
-        return {
-            "plan": "No se pudo generar el plan en este momento.",
-            "courses": []
-        }
-
-# Funciones de generación de reportes
-def generate_pdf_report(user_data, financial_data, analysis_data):
-    """Genera un reporte PDF con los resultados"""
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    
-    # Encabezado
-    pdf.set_font("Arial", 'B', 16)
-    pdf.cell(200, 10, txt="Taller de Bienes Raíces - Reporte Personalizado", ln=1, align='C')
-    pdf.set_font("Arial", 'B', 14)
-    pdf.cell(200, 10, txt="Análisis Financiero y Plan de Inversión", ln=1, align='C')
-    pdf.ln(10)
-    
-    # Información del usuario
-    pdf.set_font("Arial", 'B', 12)
-    pdf.cell(200, 10, txt="Información Personal", ln=1)
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt=f"Nombre: {user_data.get('name', '')}", ln=1)
-    pdf.cell(200, 10, txt=f"Edad: {user_data.get('age', '')}", ln=1)
-    pdf.cell(200, 10, txt=f"Email: {user_data.get('email', '')}", ln=1)
-    pdf.cell(200, 10, txt=f"Teléfono: {user_data.get('phone', '')}", ln=1)
-    pdf.ln(5)
-    
-    # Situación financiera
-    pdf.set_font("Arial", 'B', 12)
-    pdf.cell(200, 10, txt="Situación Financiera Actual", ln=1)
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt=f"Ingresos Mensuales: {format_currency(financial_data.get('income', 0))}", ln=1)
-    pdf.cell(200, 10, txt=f"Gastos Mensuales: {format_currency(financial_data.get('expenses', 0))}", ln=1)
-    pdf.cell(200, 10, txt=f"Activos Totales: {format_currency(financial_data.get('assets', 0))}", ln=1)
-    pdf.cell(200, 10, txt=f"Pasivos Totales: {format_currency(financial_data.get('liabilities', 0))}", ln=1)
-    pdf.cell(200, 10, txt=f"Patrimonio Neto: {format_currency(financial_data.get('net_worth', 0))}", ln=1)
-    pdf.ln(5)
-    
-    # Análisis y recomendaciones
-    if 'profile' in analysis_data:
-        pdf.set_font("Arial", 'B', 12)
-        pdf.cell(200, 10, txt=f"Perfil de Inversión: {analysis_data['profile']['level']}", ln=1)
-        pdf.set_font("Arial", size=12)
-        pdf.multi_cell(0, 10, txt=analysis_data['profile']['description'])
-        pdf.ln(5)
-        
-        pdf.set_font("Arial", 'B', 12)
-        pdf.cell(200, 10, txt="Recomendaciones Específicas:", ln=1)
-        pdf.set_font("Arial", size=12)
-        for rec in analysis_data['profile']['recommendations']:
-            pdf.cell(200, 10, txt=f"- {rec}", ln=1)
-        pdf.ln(5)
-    
-    # Plan de inversión
-    if 'investment_plan' in analysis_data:
-        pdf.set_font("Arial", 'B', 12)
-        pdf.cell(200, 10, txt="Plan de Inversión Personalizado:", ln=1)
-        pdf.set_font("Arial", size=12)
-        pdf.multi_cell(0, 10, txt=analysis_data['investment_plan']['plan'])
-        pdf.ln(5)
-        
-        if analysis_data['investment_plan']['courses']:
-            pdf.set_font("Arial", 'B', 12)
-            pdf.cell(200, 10, txt="Cursos Recomendados:", ln=1)
-            pdf.set_font("Arial", size=12)
-            for course in analysis_data['investment_plan']['courses']:
-                pdf.cell(200, 10, txt=f"- {course}", ln=1)
-            pdf.ln(5)
-    
-    # Plan de retiro
-    if 'retirement_plan' in analysis_data:
-        pdf.set_font("Arial", 'B', 12)
-        pdf.cell(200, 10, txt="Plan de Retiro con Bienes Raíces:", ln=1)
-        pdf.set_font("Arial", size=12)
-        pdf.multi_cell(0, 10, txt=analysis_data['retirement_plan']['analysis'])
-        pdf.ln(5)
-    
-    # Pie de página
-    pdf.set_font("Arial", 'I', 10)
-    pdf.cell(200, 10, txt=f"Generado el {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=1, align='C')
-    
-    # Guardar PDF en memoria
-    pdf_output = BytesIO()
-    pdf.output(pdf_output)
-    pdf_bytes = pdf_output.getvalue()
-    pdf_output.close()
-    
-    return pdf_bytes
+        return "No se pudo generar el plan en este momento."
 
 # Interfaz principal
 def main():
-    # Inicializar CSS y base de datos
     load_css()
-    init_database()
+    crear_base_datos()
     
     # Encabezado
     st.markdown("""
     <div class="header-container">
         <div>
-            <h1 style="margin:0;">Taller de Bienes Raíces</h1>
+            <h1 style="margin:0;color:#1E3A8A;">Taller de Bienes Raíces</h1>
             <h3 style="margin:0;color:#6B7280;">Calculadora Financiera para Inversión Inmobiliaria</h3>
         </div>
         <img src="https://raw.githubusercontent.com/Santospe2000/Calculator_IA/main/WhatsApp%20Image%202025-05-19%20at%2012.57.14%20PM.jpeg" class="logo" alt="Logo">
     </div>
     
-    <div class="card">
-        <p>Esta herramienta te ayudará a analizar tu capacidad para invertir en bienes raíces, 
-        crear un plan de acción personalizado y establecer metas claras para construir 
-        patrimonio inmobiliario de manera inteligente.</p>
+    <div class="calculator-container">
+        Esta herramienta te ayudará a analizar tu capacidad para invertir en bienes raíces, 
+        crear un plan de acción y establecer metas claras para construir patrimonio inmobiliario.
     </div>
     """, unsafe_allow_html=True)
     
     # Inicializar variables de sesión
-    if 'user_data' not in st.session_state:
-        st.session_state['user_data'] = {}
-    if 'financial_data' not in st.session_state:
-        st.session_state['financial_data'] = {}
-    if 'analysis_data' not in st.session_state:
-        st.session_state['analysis_data'] = {}
+    if 'reporte_data' not in st.session_state:
+        st.session_state['reporte_data'] = {'usuario': {}, 'finanzas': {}, 'analisis': {}}
     
-    # Paso 1: Información personal
-    with st.expander("📝 Información Personal", expanded=True):
-        st.markdown("### Completa tus datos básicos")
-        
-        col1, col2 = st.columns(2)
-        name = col1.text_input("Nombre completo*")
-        age = col2.number_input("Edad*", min_value=18, max_value=100, value=30)
-        
-        email = st.text_input("Email*")
-        phone = st.text_input("Teléfono")
+    # Paso 1: Registro de usuario
+    with st.container():
+        st.subheader("📝 Información Personal")
+        nombre = st.text_input("Nombre completo")
+        edad = st.number_input("Edad", min_value=18, max_value=100, value=30)
+        email = st.text_input("Email")
+        telefono = st.text_input("Teléfono")
         
         if st.button("Guardar información personal"):
-            if name and email and age:
-                user_id = save_user_data(name, age, email, phone)
-                if user_id:
-                    st.session_state['user_id'] = user_id
-                    st.session_state['user_data'] = {
-                        'name': name,
-                        'age': age,
-                        'email': email,
-                        'phone': phone
-                    }
-                    st.success("Información guardada correctamente")
-            else:
-                st.warning("Por favor completa los campos obligatorios (*)")
-    
-    # Paso 2: Datos financieros (solo si usuario está registrado)
-    if 'user_id' in st.session_state:
-        with st.expander("💰 Situación Financiera", expanded=True):
-            st.markdown("### Ingresa tus datos financieros")
-            
-            # Activos
-            st.markdown("#### Activos")
-            col1, col2, col3 = st.columns([3, 1, 1])
-            col1.markdown("**Descripción**")
-            col2.markdown("**Valor ($)**")
-            col3.markdown("**Deuda ($)**")
-            
-            assets_items = [
-                {"name": "Efectivo y cuentas bancarias", "help": "Saldo total en cuentas de ahorro y corriente"},
-                {"name": "Inversiones financieras", "help": "Acciones, bonos, fondos de inversión, etc."},
-                {"name": "Propiedades inmobiliarias", "help": "Valor de mercado de tus propiedades"},
-                {"name": "Vehículos", "help": "Valor actual de tus vehículos"},
-                {"name": "Otros activos", "help": "Joyas, arte, equipos, etc."}
-            ]
-            
-            assets_values = {}
-            for item in assets_items:
-                cols = st.columns([3, 1, 1])
-                cols[0].markdown(item['name'])
-                emoji_help_tooltip(item['help'])
-                
-                value = cols[1].number_input(
-                    f"Valor {item['name']}",
-                    min_value=0.0,
-                    value=0.0,
-                    key=f"asset_{item['name']}_value",
-                    label_visibility="collapsed"
-                )
-                
-                debt = cols[2].number_input(
-                    f"Deuda {item['name']}",
-                    min_value=0.0,
-                    value=0.0,
-                    key=f"asset_{item['name']}_debt",
-                    label_visibility="collapsed"
-                )
-                
-                assets_values[item['name']] = {
-                    "value": value,
-                    "debt": debt,
-                    "net": value - debt
+            if nombre and email:
+                usuario_id = registrar_usuario(nombre, edad, email, telefono)
+                st.session_state['usuario_id'] = usuario_id
+                st.session_state['reporte_data']['usuario'] = {
+                    'nombre': nombre, 'edad': edad, 'email': email, 'telefono': telefono
                 }
-            
-            # Calcular totales de activos
-            total_assets = sum(item['value'] for item in assets_values.values())
-            total_assets_debt = sum(item['debt'] for item in assets_values.values())
-            net_assets = total_assets - total_assets_debt
-            
-            st.markdown(f"""
-            **Total Activos:** {format_currency(total_assets)}  
-            **Total Deuda Activos:** {format_currency(total_assets_debt)}  
-            **Activos Netos:** {format_currency(net_assets)}
+                st.success("Información guardada correctamente")
+            else:
+                st.warning("Por favor completa todos los campos obligatorios")
+    
+    # Paso 2: Datos financieros
+    if 'usuario_id' in st.session_state:
+        with st.container():
+            st.subheader("📊 Elaborar mi presupuesto")
+            st.markdown("""
+            **Ejercicio:** Haz un presupuesto detallado de tus gastos. 
+            Revisa extractos y anota todo lo que gastas en efectivo. 
+            Identifica oportunidades para destinar recursos a inversión en bienes raíces.
             """)
             
-            # Pasivos
-            st.markdown("#### Pasivos")
-            liabilities_items = [
-                {"name": "Tarjetas de crédito", "help": "Saldo total adeudado en tarjetas"},
-                {"name": "Préstamos personales", "help": "Préstamos de consumo, estudiantiles, etc."},
-                {"name": "Hipotecas", "help": "Saldo pendiente de préstamos hipotecarios"},
-                {"name": "Otros pasivos", "help": "Cualquier otra deuda no clasificada"}
+            st.subheader("💰 Activos y Pasivos")
+            
+            # Tabla de ejemplo como expander
+            with st.expander("📋 Ver tabla de ejemplo para guiarte"):
+                st.markdown("""
+                <table class="example-table">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Valor</th>
+                            <th>Deuda</th>
+                            <th>Neto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Inmueble 1</td>
+                            <td>$80,000.00</td>
+                            <td>$30,000.00</td>
+                            <td>$50,000.00</td>
+                        </tr>
+                        <tr>
+                            <td>Inmueble 2</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Automóvil 1</td>
+                            <td>$15,000.00</td>
+                            <td>$18,000.00</td>
+                            <td>$(3,000.00)</td>
+                        </tr>
+                        <tr>
+                            <td>Automóvil 2</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Muebles</td>
+                            <td>$5,000.00</td>
+                            <td>$1,500.00</td>
+                            <td>$3,500.00</td>
+                        </tr>
+                        <tr>
+                            <td>Joyas</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Arte</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Efectivo cuenta 1</td>
+                            <td>$2,000.00</td>
+                            <td></td>
+                            <td>$2,000.00</td>
+                        </tr>
+                        <tr>
+                            <td>Efectivo cuenta 2</td>
+                            <td>$1,500.00</td>
+                            <td></td>
+                            <td>$1,500.00</td>
+                        </tr>
+                        <tr>
+                            <td>Deudas por cobrar</td>
+                            <td>$3,000.00</td>
+                            <td></td>
+                            <td>$3,000.00</td>
+                        </tr>
+                        <tr>
+                            <td>Acciones</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Bonos o títulos valores</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Fondo de retiro</td>
+                            <td>$30,000.00</td>
+                            <td></td>
+                            <td>$30,000.00</td>
+                        </tr>
+                        <tr>
+                            <td>Bonos o derechos laborales</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Tarjeta de crédito 1</td>
+                            <td></td>
+                            <td>$6,500.00</td>
+                            <td>$(6,500.00)</td>
+                        </tr>
+                        <tr>
+                            <td>Tarjeta de crédito 2</td>
+                            <td></td>
+                            <td>$8,200.00</td>
+                            <td>$(8,200.00)</td>
+                        </tr>
+                        <tr>
+                            <td>Tarjeta de crédito 3</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Otra deuda 1</td>
+                            <td></td>
+                            <td>$4,700.00</td>
+                            <td>$(4,700.00)</td>
+                        </tr>
+                        <tr>
+                            <td>Otra deuda 2</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Otra deuda 3</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Otros</td>
+                            <td></td>
+                            <td></td>
+                            <td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td><strong>$136,500.00</strong></td>
+                            <td><strong>$68,900.00</strong></td>
+                            <td><strong>$67,600.00</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                """, unsafe_allow_html=True)
+            
+            st.markdown("""
+            **Cómo diligenciar esta sección:**
+            1. **Descripción**: Nombre del activo o pasivo
+            2. **Valor**: Valor total del activo o monto total de la deuda
+            3. **Deuda**: Para activos, la deuda asociada (ej: hipoteca)
+            4. **Neto**: Diferencia entre Valor y Deuda (calculado automáticamente)
+            
+            Ejemplos:
+            - Inmueble: Valor = precio de mercado, Deuda = saldo hipotecario
+            - Automóvil: Valor = precio actual, Deuda = préstamo pendiente
+            - Tarjetas: Valor = límite de crédito, Deuda = saldo adeudado
+            """)
+            
+            # Definir items de activos y pasivos
+            activos_items = [
+                {"nombre": "Inmueble 1", "help": "Valor de mercado de tu primera propiedad"},
+                {"nombre": "Inmueble 2", "help": "Valor de mercado de tu segunda propiedad"},
+                {"nombre": "Automóvil 1", "help": "Valor actual de tu vehículo principal"},
+                {"nombre": "Automóvil 2", "help": "Valor actual de tu segundo vehículo"},
+                {"nombre": "Muebles", "help": "Valor estimado de muebles y enseres"},
+                {"nombre": "Joyas", "help": "Valor estimado de joyas y artículos de valor"},
+                {"nombre": "Arte", "help": "Valor estimado de obras de arte y colecciones"},
+                {"nombre": "Efectivo cuenta 1", "help": "Saldo disponible en tu cuenta principal"},
+                {"nombre": "Efectivo cuenta 2", "help": "Saldo disponible en cuentas secundarias"},
+                {"nombre": "Deudas por cobrar", "help": "Dinero que te deben otras personas o empresas"},
+                {"nombre": "Bonos o títulos valores", "help": "Valor de tus inversiones financieras"},
+                {"nombre": "Fondo de retiro", "help": "Saldo acumulado en fondos de pensiones"},
+                {"nombre": "Bonos o derechos laborales", "help": "Valor de prestaciones laborales"}
             ]
             
-            liabilities_values = {}
-            for item in liabilities_items:
-                cols = st.columns([3, 1])
-                cols[0].markdown(item['name'])
-                emoji_help_tooltip(item['help'])
+            pasivos_items = [
+                {"nombre": "Tarjeta de crédito 1", "help": "Saldo pendiente en tu tarjeta principal"},
+                {"nombre": "Tarjeta de crédito 2", "help": "Saldo pendiente en tarjetas secundarias"},
+                {"nombre": "Tarjeta de crédito 3", "help": "Otras deudas con tarjetas de crédito"},
+                {"nombre": "Otra deuda 1", "help": "Préstamos personales o de consumo"},
+                {"nombre": "Otra deuda 2", "help": "Préstamos estudiantiles o educativos"},
+                {"nombre": "Otra deuda 3", "help": "Otras obligaciones financieras"},
+                {"nombre": "Otros", "help": "Cualquier otra deuda no clasificada"}
+            ]
+            
+            # Inicializar valores
+            if 'activos_values' not in st.session_state:
+                st.session_state['activos_values'] = {item['nombre']: {"valor": 0.0, "deuda": 0.0} for item in activos_items}
+            
+            if 'pasivos_values' not in st.session_state:
+                st.session_state['pasivos_values'] = {item['nombre']: {"valor": 0.0, "deuda": 0.0} for item in pasivos_items}
+            
+            # Tabla de activos con los nuevos títulos
+            st.markdown("### Activos")
+            activos_total = {"valor": 0.0, "deuda": 0.0, "neto": 0.0}
+            
+            # Encabezados de columna modificados
+            cols = st.columns([3, 1, 1, 1])
+            with cols[1]: st.markdown("**Valor ($)**")
+            with cols[2]: st.markdown("**Deuda ($)**")
+            with cols[3]: st.markdown("**Activo Neto ($)**")
+
+            for item in activos_items:
+                cols = st.columns([3, 1, 1, 1])
                 
-                value = cols[1].number_input(
-                    f"Valor {item['name']}",
-                    min_value=0.0,
-                    value=0.0,
-                    key=f"liability_{item['name']}_value",
+                with cols[0]:
+                    st.markdown(f"{item['nombre']}", unsafe_allow_html=True)
+                    emoji_help_tooltip(item['help'])
+                
+                valor = cols[1].text_input(
+                    f"Valor {item['nombre']}",
+                    value=format_currency(st.session_state['activos_values'][item['nombre']]['valor']),
+                    key=f"activo_valor_{item['nombre']}",
                     label_visibility="collapsed"
                 )
                 
-                liabilities_values[item['name']] = value
+                deuda = cols[2].text_input(
+                    f"Deuda {item['nombre']}",
+                    value=format_currency(st.session_state['activos_values'][item['nombre']]['deuda']),
+                    key=f"activo_deuda_{item['nombre']}",
+                    label_visibility="collapsed"
+                )
+                
+                valor_parsed = parse_currency(valor)
+                deuda_parsed = parse_currency(deuda)
+                neto = valor_parsed - deuda_parsed
+                
+                cols[3].markdown(format_currency(neto))
+                
+                st.session_state['activos_values'][item['nombre']] = {
+                    "valor": valor_parsed,
+                    "deuda": deuda_parsed
+                }
+                
+                activos_total["valor"] += valor_parsed
+                activos_total["deuda"] += deuda_parsed
+                activos_total["neto"] += neto
             
-            total_liabilities = sum(liabilities_values.values())
+            # Tabla de pasivos con los nuevos títulos
+            st.markdown("### Pasivos")
+            pasivos_total = {"valor": 0.0, "deuda": 0.0, "neto": 0.0}
             
-            st.markdown(f"**Total Pasivos:** {format_currency(total_liabilities)}")
+            # Encabezados de columna modificados
+            cols = st.columns([3, 1, 1, 1])
+            with cols[1]: st.markdown("**Valor ($)**")
+            with cols[2]: st.markdown("**Deuda ($)**")
+            with cols[3]: st.markdown("**Activo Neto ($)**")
+
+            for item in pasivos_items:
+                cols = st.columns([3, 1, 1, 1])
+                
+                with cols[0]:
+                    st.markdown(f"{item['nombre']}", unsafe_allow_html=True)
+                    emoji_help_tooltip(item['help'])
+                
+                valor = cols[1].text_input(
+                    f"Valor {item['nombre']}",
+                    value=format_currency(st.session_state['pasivos_values'][item['nombre']]['valor']),
+                    key=f"pasivo_valor_{item['nombre']}",
+                    label_visibility="collapsed"
+                )
+                
+                deuda = cols[2].text_input(
+                    f"Deuda {item['nombre']}",
+                    value=format_currency(st.session_state['pasivos_values'][item['nombre']]['deuda']),
+                    key=f"pasivo_deuda_{item['nombre']}",
+                    label_visibility="collapsed"
+                )
+                
+                valor_parsed = parse_currency(valor)
+                deuda_parsed = parse_currency(deuda)
+                neto = -(valor_parsed - deuda_parsed)
+                
+                cols[3].markdown(format_currency(neto))
+                
+                st.session_state['pasivos_values'][item['nombre']] = {
+                    "valor": valor_parsed,
+                    "deuda": deuda_parsed
+                }
+                
+                pasivos_total["valor"] += valor_parsed
+                pasivos_total["deuda"] += deuda_parsed
+                pasivos_total["neto"] += neto
             
-            # Patrimonio neto
-            net_worth = net_assets - total_liabilities
-            st.markdown(f"**Patrimonio Neto:** {format_currency(net_worth)}")
+            # Mostrar totales
+            st.markdown("### Resumen Financiero")
+            patrimonio_neto = activos_total['neto'] + pasivos_total['neto']
+            
+            st.markdown(f"""
+            - **Total Valor Activos:** {format_currency(activos_total['valor'])}
+            - **Total Deuda Activos:** {format_currency(activos_total['deuda'])}
+            - **Total Activos Netos:** {format_currency(activos_total['neto'])}
+            - **Total Pasivos:** {format_currency(pasivos_total['neto'])}
+            - **Patrimonio Neto:** {format_currency(patrimonio_neto)}
+            """)
             
             # Flujo de caja mensual
-            st.markdown("#### Flujo de Caja Mensual")
+            st.subheader("💸 Flujo de Caja Mensual")
             
-            st.markdown("##### Ingresos Mensuales")
-            col1, col2 = st.columns(2)
-            salary = col1.number_input("Salario/sueldo", min_value=0.0, value=0.0)
-            other_income = col2.number_input("Otros ingresos", min_value=0.0, value=0.0)
-            total_income = salary + other_income
+            # Inicializar valores
+            if 'ingresos_values' not in st.session_state:
+                st.session_state['ingresos_values'] = {
+                    "Ingresos mensuales adulto 1": {"valor": 0.0},
+                    "Ingresos mensuales adulto 2": {"valor": 0.0},
+                    "Otros ingresos": {"valor": 0.0}
+                }
             
-            st.markdown("##### Gastos Mensuales")
-            col1, col2 = st.columns(2)
-            housing = col1.number_input("Vivienda (arriendo/hipoteca)", min_value=0.0, value=0.0)
-            utilities = col2.number_input("Servicios públicos", min_value=0.0, value=0.0)
+            if 'gastos_values' not in st.session_state:
+                st.session_state['gastos_values'] = {
+                    "Gasto de Inmueble 1": {"valor": 0.0},
+                    "Gasto de Inmueble 2": {"valor": 0.0},
+                    "Alimentación": {"valor": 0.0},
+                    "Educación": {"valor": 0.0},
+                    "Transporte": {"valor": 0.0},
+                    "Salud": {"valor": 0.0},
+                    "Entretenimiento": {"valor": 0.0},
+                    "Servicios públicos": {"valor": 0.0},
+                    "Seguros": {"valor": 0.0},
+                    "Otros gastos": {"valor": 0.0}
+                }
             
-            col1, col2 = st.columns(2)
-            food = col1.number_input("Alimentación", min_value=0.0, value=0.0)
-            transportation = col2.number_input("Transporte", min_value=0.0, value=0.0)
+            # Ingresos
+            st.markdown("#### Ingresos")
+            ingresos_total = 0.0
             
-            col1, col2 = st.columns(2)
-            health = col1.number_input("Salud", min_value=0.0, value=0.0)
-            entertainment = col2.number_input("Entretenimiento", min_value=0.0, value=0.0)
+            for item, data in st.session_state['ingresos_values'].items():
+                value = st.text_input(
+                    item,
+                    value=format_currency(data['valor']),
+                    key=f"ingreso_{item}"
+                )
+                parsed_value = parse_currency(value)
+                st.session_state['ingresos_values'][item]['valor'] = parsed_value
+                ingresos_total += parsed_value
             
-            other_expenses = st.number_input("Otros gastos", min_value=0.0, value=0.0)
-            total_expenses = housing + utilities + food + transportation + health + entertainment + other_expenses
+            # Gastos
+            st.markdown("#### Gastos")
+            gastos_total = 0.0
             
-            cash_flow = total_income - total_expenses
+            for item, data in st.session_state['gastos_values'].items():
+                value = st.text_input(
+                    item,
+                    value=format_currency(data['valor']),
+                    key=f"gasto_{item}"
+                )
+                parsed_value = parse_currency(value)
+                st.session_state['gastos_values'][item]['valor'] = parsed_value
+                gastos_total += parsed_value
             
+            # Calcular saldo mensual
+            saldo_mensual = ingresos_total - gastos_total
             st.markdown(f"""
             **Resumen Flujo de Caja:**
-            - **Total Ingresos:** {format_currency(total_income)}
-            - **Total Gastos:** {format_currency(total_expenses)}
-            - **Flujo de Caja Mensual:** {format_currency(cash_flow)}  
+            - **Total Ingresos:** {format_currency(ingresos_total)}
+            - **Total Gastos:** {format_currency(gastos_total)}
+            - **Saldo Mensual:** {format_currency(saldo_mensual)}
             """)
             
-            if st.button("Analizar mi situación financiera"):
-                analysis = analyze_financial_profile(
-                    total_income, total_expenses, 
-                    net_assets, total_liabilities
+            if st.button("Analizar mi situación financiera para bienes raíces"):
+                analisis = analizar_situacion_financiera(
+                    ingresos_total, gastos_total, 
+                    activos_total['neto'], abs(pasivos_total['neto'])
                 )
-                
-                # Guardar datos financieros
-                save_financial_data(
-                    st.session_state['user_id'],
-                    total_income, total_expenses,
-                    net_assets, total_liabilities, net_worth
-                )
-                
-                st.session_state['financial_data'] = {
-                    'income': total_income,
-                    'expenses': total_expenses,
-                    'assets': net_assets,
-                    'liabilities': total_liabilities,
-                    'net_worth': net_worth,
-                    'cash_flow': cash_flow
+                st.session_state['reporte_data']['finanzas'] = {
+                    'ingresos': ingresos_total,
+                    'gastos': gastos_total,
+                    'activos': activos_total['neto'],
+                    'pasivos': abs(pasivos_total['neto'])
                 }
+                st.session_state['reporte_data']['analisis'].update({
+                    'resumen': analisis['resumen'],
+                    'perfil_inversion': analisis['perfil_inversion']
+                })
                 
-                st.session_state['analysis_data']['profile'] = analysis['profile']
-                st.session_state['analysis_data']['summary'] = analysis['summary']
+                plan = generar_plan_trabajo(
+                    ingresos_total, gastos_total, 
+                    activos_total['neto'], abs(pasivos_total['neto'])
+                )
+                st.subheader("📝 Plan de Trabajo para Inversión en Bienes Raíces")
+                st.write(plan)
+                st.session_state['reporte_data']['analisis']['plan_trabajo'] = plan
+    
+    # Paso 3: Plan de inversión
+    if 'usuario_id' in st.session_state and 'reporte_data' in st.session_state and 'finanzas' in st.session_state['reporte_data']:
+        with st.container():
+            st.subheader("📈 Plan de Inversión en Bienes Raíces")
+            
+            with st.expander("💡 ESTRATEGIAS PARA INVERTIR EN BIENES RAÍCES"):
+                st.markdown("""
+                1. **Propiedades en Remate Bancario**  
+                Los bancos venden propiedades embargadas por debajo del valor de mercado.
                 
-                st.success("Análisis completado correctamente")
-                st.markdown(analysis['summary'])
+                2. **Compra con Opción de Compra**  
+                Negocia el derecho a comprar la propiedad en el futuro mientras la alquilas.
+                
+                3. **Co-Inversiones**  
+                Asóciate con otros inversionistas para adquirir propiedades.
+                
+                4. **Propiedades con Dueño Directo**  
+                Encuentra mejores negocios tratando directamente con dueños.
+                
+                5. **Rehabilitación de Propiedades**  
+                Compra propiedades que necesiten reparaciones, haz mejoras y véndelas con ganancia.
+                """)
+            
+            objetivos = st.text_input("Objetivos específicos con bienes raíces", 
+                                    "Generar ingresos pasivos a través de propiedades en alquiler")
+            horizonte = st.selectbox("Horizonte de inversión", 
+                                   ["Corto plazo (1-3 años)", "Mediano plazo (3-5 años)", "Largo plazo (5+ años)"])
+            estrategias = st.multiselect("Estrategias de interés", 
+                                       ["Alquiler residencial", "Alquiler comercial", "Rehabilitación y venta", 
+                                        "Terrenos", "Remates bancarios", "Rentas vacacionales", "Co-inversiones"])
+            
+            if st.button("Generar estrategia personalizada"):
+                st.session_state['plan_inversion'] = (objetivos, horizonte, ", ".join(estrategias))
+                ingresos = st.session_state['reporte_data']['finanzas']['ingresos']
+                gastos = st.session_state['reporte_data']['finanzas']['gastos']
+                activos = st.session_state['reporte_data']['finanzas']['activos']
+                pasivos = st.session_state['reporte_data']['finanzas']['pasivos']
+                
+                analisis_ia = generar_plan_trabajo(ingresos, gastos, activos, pasivos)
+                st.write(analisis_ia)
+                st.session_state['reporte_data']['analisis']['analisis_ia'] = analisis_ia
     
-    # Paso 3: Plan de inversión (solo si hay datos financieros)
-    if 'financial_data' in st.session_state and st.session_state['financial_data']:
-        with st.expander("📈 Plan de Inversión", expanded=True):
-            st.markdown("### Define tus objetivos de inversión")
-            
-            objectives = st.text_area(
-                "¿Cuáles son tus objetivos con la inversión en bienes raíces?",
-                "Generar ingresos pasivos a través de propiedades en alquiler, diversificar mis inversiones y construir patrimonio a largo plazo."
-            )
-            
-            horizon = st.selectbox(
-                "Horizonte de tiempo para tus inversiones",
-                ["Corto plazo (1-3 años)", "Mediano plazo (3-5 años)", "Largo plazo (5+ años)"]
-            )
-            
-            strategies = st.multiselect(
-                "Estrategias de interés",
-                [
-                    "Alquiler residencial", "Alquiler comercial", "Rehabilitación y venta",
-                    "Terrenos", "Remates bancarios", "Rentas vacacionales", "Co-inversiones",
-                    "Fondos inmobiliarios (REITs)", "Desarrollo de propiedades"
-                ],
-                default=["Alquiler residencial", "Rehabilitación y venta"]
-            )
-            
-            risk_tolerance = st.select_slider(
-                "Tolerancia al riesgo",
-                options=["Muy baja", "Baja", "Moderada", "Alta", "Muy alta"],
-                value="Moderada"
-            )
-            
-            if st.button("Generar plan de inversión personalizado"):
-                with st.spinner("Creando tu plan de inversión..."):
-                    financial_data = st.session_state['financial_data']
-                    investment_plan = generate_investment_plan(
-                        financial_data['income'],
-                        financial_data['expenses'],
-                        financial_data['assets'],
-                        financial_data['liabilities'],
-                        objectives,
-                        horizon,
-                        ", ".join(strategies)
-                    )
-                    
-                    # Guardar objetivos de inversión
-                    save_investment_goals(
-                        st.session_state['user_id'],
-                        objectives,
-                        horizon,
-                        ", ".join(strategies),
-                        risk_tolerance
-                    )
-                    
-                    st.session_state['analysis_data']['investment_plan'] = investment_plan
-                    
-                    st.success("Plan de inversión generado")
-                    st.markdown(investment_plan['plan'])
-                    
-                    if investment_plan['courses']:
-                        st.markdown("### Cursos Recomendados")
-                        for course in investment_plan['courses']:
-                            st.markdown(f"- {course}")
-    
-    # Paso 4: Plan de retiro (solo si hay datos financieros)
-    if 'financial_data' in st.session_state and st.session_state['financial_data']:
-        with st.expander("👴 Plan de Retiro", expanded=True):
-            st.markdown("### Planificación de Retiro con Bienes Raíces")
+    # Paso 4: Plan de retiro
+    if 'usuario_id' in st.session_state and 'reporte_data' in st.session_state and 'finanzas' in st.session_state['reporte_data']:
+        with st.container():
+            st.subheader("👴 Plan de Retiro con Bienes Raíces")
             
             col1, col2 = st.columns(2)
-            current_age = col1.number_input(
-                "Tu edad actual",
-                min_value=18,
-                max_value=100,
-                value=st.session_state['user_data'].get('age', 30)
-            )
-            retirement_age = col2.number_input(
-                "Edad de retiro deseada",
-                min_value=current_age + 1,
-                max_value=100,
-                value=65
-            )
+            edad_actual = col1.number_input("Tu edad actual", min_value=18, max_value=100, value=30)
+            edad_retiro = col2.number_input("Edad de retiro deseada", min_value=edad_actual+1, max_value=100, value=65)
             
-            retirement_income = st.number_input(
-                "Ingresos anuales deseados durante el retiro ($)",
-                min_value=0,
-                value=40000
-            )
-            retirement_expenses = st.number_input(
-                "Gastos anuales estimados durante el retiro ($)",
-                min_value=0,
-                value=30000
-            )
-            current_savings = st.number_input(
-                "Ahorros actuales para el retiro ($)",
-                min_value=0,
-                value=10000
-            )
+            ingresos_retiro = parse_currency(st.text_input("Ingresos anuales esperados durante el retiro ($)", value="$40,000"))
+            gastos_retiro = parse_currency(st.text_input("Gastos anuales esperados durante el retiro ($)", value="$30,000"))
+            ahorros_retiro = parse_currency(st.text_input("Ahorros actuales para el retiro ($)", value="$10,000"))
             
-            if st.button("Calcular proyección de retiro"):
-                financial_data = st.session_state['financial_data']
-                retirement_plan = generate_retirement_plan(
-                    current_age,
-                    retirement_age,
-                    retirement_income,
-                    retirement_expenses,
-                    current_savings,
-                    financial_data['net_worth'],
-                    financial_data['cash_flow']
+            if st.button("Calcular proyección de retiro con bienes raíces"):
+                ingresos = st.session_state['reporte_data']['finanzas']['ingresos']
+                gastos = st.session_state['reporte_data']['finanzas']['gastos']
+                activos = st.session_state['reporte_data']['finanzas']['activos']
+                pasivos = st.session_state['reporte_data']['finanzas']['pasivos']
+                
+                flujo_caja = ingresos - gastos
+                patrimonio_neto = activos - pasivos
+                
+                analisis = analizar_proyeccion_retiro(
+                    edad_actual, edad_retiro, 
+                    ingresos_retiro, gastos_retiro, 
+                    ahorros_retiro, patrimonio_neto, flujo_caja
                 )
+                st.session_state['reporte_data']['analisis']['proyeccion_retiro'] = analisis
                 
-                st.session_state['analysis_data']['retirement_plan'] = retirement_plan
-                
-                st.success("Proyección de retiro calculada")
-                st.markdown(retirement_plan['analysis'])
+                st.write(analisis['analisis'])
     
-    # Generar reporte PDF (solo si hay datos completos)
-    if all(key in st.session_state for key in ['user_data', 'financial_data', 'analysis_data']):
-        with st.expander("📄 Generar Reporte", expanded=True):
-            st.markdown("### Descarga tu reporte personalizado")
+    # Descargar PDF
+    if 'reporte_data' in st.session_state and st.session_state['reporte_data']['usuario']:
+        if st.button("📄 Descargar Reporte Completo en PDF"):
+            pdf_bytes = generar_pdf(
+                st.session_state['reporte_data']['usuario'],
+                st.session_state['reporte_data']['finanzas'],
+                st.session_state['reporte_data']['analisis']
+            )
             
-            if st.button("Generar Reporte Completo en PDF"):
-                pdf_bytes = generate_pdf_report(
-                    st.session_state['user_data'],
-                    st.session_state['financial_data'],
-                    st.session_state['analysis_data']
-                )
-                
-                st.success("Reporte generado con éxito")
-                
-                # Crear enlace de descarga
-                b64 = base64.b64encode(pdf_bytes).decode()
-                href = f"""
-                <a href="data:application/octet-stream;base64,{b64}" 
-                   download="reporte_bienes_raices_{st.session_state['user_data']['name'].replace(' ', '_')}.pdf"
-                   style="display: inline-block; padding: 0.5rem 1rem; background-color: #1E3A8A; color: white; border-radius: 8px; text-decoration: none;">
-                   Descargar Reporte PDF
-                </a>
-                """
-                st.markdown(href, unsafe_allow_html=True)
+            st.success("Reporte generado con éxito!")
+            b64 = base64.b64encode(pdf_bytes).decode()
+            href = f'<a href="data:application/octet-stream;base64,{b64}" download="reporte_bienes_raices.pdf">Haz clic aquí para descargar</a>'
+            st.markdown(href, unsafe_allow_html=True)
     
     # Pie de página
     st.markdown("---")
     st.markdown("""
-    <div class="card">
-        <h3>📌 Próximos Pasos</h3>
-        <ul>
-            <li>Revisa nuestro <a href="https://www.youtube.com/@carlosdevis" target="_blank">canal de YouTube</a> para más estrategias</li>
-            <li>Inscríbete en nuestro <a href="https://landing.tallerdebienesraices.com/registro-ciclo-educativo/" target="_blank">ciclo educativo</a></li>
-            <li>Asiste a nuestros eventos presenciales y online</li>
-            <li>Comienza con una propiedad pequeña y escala progresivamente</li>
-        </ul>
-        
-        <p style="text-align: center; margin-top: 1rem; color: #6B7280; font-size: 0.9rem;">
-            © 2023 Taller de Bienes Raíces - Todos los derechos reservados
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    **📌 Próximos Pasos**
+    - Revisa nuestro [canal de YouTube](https://www.youtube.com/@carlosdevis)
+    - Inscríbete en nuestro [ciclo educativo](https://landing.tallerdebienesraices.com/registro-ciclo-educativo/)
+    - Asiste a nuestros eventos presenciales y online
+    - Comienza con una propiedad pequeña y escala progresivamente
+    """)
 
 if __name__ == "__main__":
     main()
